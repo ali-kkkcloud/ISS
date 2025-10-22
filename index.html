@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cautio - Professional Issue Tracker</title>
+    <title>Cautio - Issue Tracker</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -13,113 +13,167 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
         * {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
         
-        .glass-morphism {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        body {
+            background: #0a0a0a;
+            color: #e5e5e5;
         }
         
-        .gradient-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .sidebar {
+            background: #1a1a1a;
+            border-right: 1px solid #2a2a2a;
         }
         
-        .gradient-card-2 {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-        
-        .gradient-card-3 {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-        
-        .gradient-card-4 {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-        
-        .tab-active {
-            background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
-        }
-        
-        .hover-lift {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .hover-lift:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
-        }
-        
-        .table-row-hover {
+        .menu-item {
             transition: all 0.2s ease;
         }
         
-        .table-row-hover:hover {
-            background: linear-gradient(90deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+        .menu-item:hover {
+            background: #2a2a2a;
+        }
+        
+        .menu-item.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .accordion-header {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            transition: all 0.3s ease;
+        }
+        
+        .accordion-header:hover {
+            background: #252525;
+            border-color: #3a3a3a;
+        }
+        
+        .accordion-header.expanded {
+            border-color: #2563eb;
+            background: #1e293b;
+        }
+        
+        .accordion-content {
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            border-top: none;
+        }
+        
+        .issue-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            transition: all 0.2s ease;
+        }
+        
+        .issue-card:hover {
+            background: #252525;
+            border-color: #3a3a3a;
             transform: translateX(4px);
         }
         
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
         }
         
-        .animate-slide-up {
-            animation: slideUp 0.5s ease-out forwards;
+        .badge-count {
+            background: #dc2626;
+            color: white;
         }
-
-        .cursor-pointer {
-            cursor: pointer;
+        
+        .badge-age {
+            background: #f59e0b;
+            color: white;
         }
-
+        
+        .badge-status {
+            background: #10b981;
+            color: white;
+        }
+        
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+        }
+        
+        .modal-content {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 1px solid #334155;
+        }
+        
         .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #6366f1;
+            border: 3px solid #2a2a2a;
+            border-top: 3px solid #2563eb;
             border-radius: 50%;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
         }
-
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .chevron {
+            transition: transform 0.3s ease;
+        }
+        
+        .chevron.expanded {
+            transform: rotate(90deg);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3a3a3a;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4a4a4a;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen">
+<body>
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        const CautioIssueTracker = () => {
+        const CautioTracker = () => {
             const [data, setData] = useState({ issues: [] });
             const [loading, setLoading] = useState(true);
             const [error, setError] = useState(null);
             const [activeTab, setActiveTab] = useState('dashboard');
             const [lastUpdated, setLastUpdated] = useState(null);
             const [selectedIssue, setSelectedIssue] = useState(null);
-            const [showModal, setShowModal] = useState(false);
+            const [expandedAssignees, setExpandedAssignees] = useState({});
+            const [expandedClients, setExpandedClients] = useState({});
+            const [expandedLocations, setExpandedLocations] = useState({});
+            const [expandedSubRequests, setExpandedSubRequests] = useState({});
 
             // Google Sheet configuration
             const SHEET_ID = '1DzW-6Q7hTNn2hSJbEHOkSrbalOmbDIftdjw4I_PhEdA';
             const SHEET_NAME = 'Issues- Realtime';
             const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
-            // Calculate age in days
             const calculateAge = (raisedDate, resolvedDate) => {
                 if (!raisedDate) return 0;
                 const raised = new Date(raisedDate);
@@ -129,33 +183,19 @@
                 return diffDays;
             };
 
-            // Parse status from Google Sheet
             const parseStatus = (resolvedValue, followUpDate) => {
                 const resolved = (resolvedValue || '').toString().toLowerCase().trim();
-                
-                if (resolved === 'yes') {
-                    return 'Closed';
-                }
-                
-                if (followUpDate && followUpDate.trim() !== '') {
-                    return 'On Hold';
-                }
-                
+                if (resolved === 'yes') return 'Closed';
+                if (followUpDate && followUpDate.trim() !== '') return 'On Hold';
                 return 'Open';
             };
 
-            // Fetch data from Google Sheets
             const fetchSheetData = async () => {
                 try {
                     setLoading(true);
                     setError(null);
-
                     const response = await fetch(CSV_URL);
-                    
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch data. Please ensure the sheet is publicly accessible.');
-                    }
-
+                    if (!response.ok) throw new Error('Failed to fetch data');
                     const csvText = await response.text();
                     
                     Papa.parse(csvText, {
@@ -191,7 +231,7 @@
                                     resolvedYN: row['Resolved Y/N'] || '',
                                     age: age
                                 };
-                            }).filter(issue => issue.assignedTo || issue.client); // Filter out empty rows
+                            }).filter(issue => issue.assignedTo || issue.client);
 
                             setData({ issues: processedIssues });
                             setLastUpdated(new Date());
@@ -201,34 +241,19 @@
                             throw new Error(`CSV parsing error: ${error.message}`);
                         }
                     });
-
                 } catch (err) {
                     setError(err.message);
                     setLoading(false);
-                    console.error('Error fetching data:', err);
                 }
             };
 
-            // Fetch data on mount and auto-refresh every 5 minutes
             useEffect(() => {
                 fetchSheetData();
                 const interval = setInterval(fetchSheetData, 5 * 60 * 1000);
                 return () => clearInterval(interval);
             }, []);
 
-            // Function to open issue details modal
-            const openIssueDetails = (issue) => {
-                setSelectedIssue(issue);
-                setShowModal(true);
-            };
-
-            // Function to close modal
-            const closeModal = () => {
-                setShowModal(false);
-                setSelectedIssue(null);
-            };
-
-            // Calculate assignee wise summary (exactly as per first screenshot)
+            // Calculate assignee summary
             const assigneeSummary = useMemo(() => {
                 const openIssues = data.issues.filter(i => i.status === 'Open');
                 const summary = {};
@@ -237,18 +262,11 @@
                     if (!summary[issue.assignedTo]) {
                         summary[issue.assignedTo] = {};
                     }
-                    
-                    const key = `${issue.subRequest}|${issue.issueDetails || ''}`;
+                    const key = issue.subRequest;
                     if (!summary[issue.assignedTo][key]) {
-                        summary[issue.assignedTo][key] = {
-                            subRequest: issue.subRequest,
-                            issueDetails: issue.issueDetails || '',
-                            count: 0,
-                            dates: []
-                        };
+                        summary[issue.assignedTo][key] = [];
                     }
-                    summary[issue.assignedTo][key].count++;
-                    summary[issue.assignedTo][key].dates.push(new Date(issue.createdDate));
+                    summary[issue.assignedTo][key].push(issue);
                 });
 
                 const result = [];
@@ -256,23 +274,20 @@
                     let totalCount = 0;
                     let oldestDate = new Date();
                     
-                    const issues = Object.values(summary[assignee]).map(item => {
-                        totalCount += item.count;
-                        const minDate = new Date(Math.min(...item.dates));
-                        if (minDate < oldestDate) oldestDate = minDate;
-                        
-                        return {
-                            subRequest: item.subRequest,
-                            issueDetails: item.issueDetails,
-                            count: item.count
-                        };
+                    const subRequests = Object.entries(summary[assignee]).map(([subRequest, issues]) => {
+                        totalCount += issues.length;
+                        issues.forEach(issue => {
+                            const date = new Date(issue.createdDate);
+                            if (date < oldestDate) oldestDate = date;
+                        });
+                        return { subRequest, issues };
                     });
 
                     const daysDiff = Math.floor((new Date() - oldestDate) / (1000 * 60 * 60 * 24));
                     
                     result.push({
                         assignedTo: assignee,
-                        issues: issues,
+                        subRequests: subRequests,
                         totalCount: totalCount,
                         oldestIssueAge: daysDiff
                     });
@@ -281,39 +296,34 @@
                 return result.sort((a, b) => a.assignedTo.localeCompare(b.assignedTo));
             }, [data]);
 
-            // Calculate client wise summary
+            // Calculate client summary
             const clientSummary = useMemo(() => {
                 const openIssues = data.issues.filter(i => i.status === 'Open');
                 const summary = {};
                 
                 openIssues.forEach(issue => {
                     if (!summary[issue.client]) {
-                        summary[issue.client] = {
-                            count: 0,
-                            issueTypes: {}
-                        };
+                        summary[issue.client] = { issues: [], subRequests: {} };
                     }
-                    summary[issue.client].count++;
+                    summary[issue.client].issues.push(issue);
                     
-                    if (!summary[issue.client].issueTypes[issue.subRequest]) {
-                        summary[issue.client].issueTypes[issue.subRequest] = 0;
+                    if (!summary[issue.client].subRequests[issue.subRequest]) {
+                        summary[issue.client].subRequests[issue.subRequest] = [];
                     }
-                    summary[issue.client].issueTypes[issue.subRequest]++;
+                    summary[issue.client].subRequests[issue.subRequest].push(issue);
                 });
 
-                return Object.keys(summary)
-                    .map(client => ({
-                        client,
-                        count: summary[client].count,
-                        issueTypes: Object.entries(summary[client].issueTypes).map(([type, count]) => ({
-                            type,
-                            count
-                        }))
+                return Object.keys(summary).map(client => ({
+                    client,
+                    count: summary[client].issues.length,
+                    subRequests: Object.entries(summary[client].subRequests).map(([subRequest, issues]) => ({
+                        subRequest,
+                        issues
                     }))
-                    .sort((a, b) => b.count - a.count);
+                })).sort((a, b) => b.count - a.count);
             }, [data]);
 
-            // Calculate location wise summary
+            // Calculate location summary
             const locationSummary = useMemo(() => {
                 const openIssues = data.issues.filter(i => i.status === 'Open');
                 const summary = {};
@@ -321,313 +331,333 @@
                 openIssues.forEach(issue => {
                     const location = issue.location || 'Unknown';
                     if (!summary[location]) {
-                        summary[location] = {
-                            count: 0,
-                            issueTypes: {}
-                        };
+                        summary[location] = { issues: [], subRequests: {} };
                     }
-                    summary[location].count++;
+                    summary[location].issues.push(issue);
                     
-                    if (!summary[location].issueTypes[issue.subRequest]) {
-                        summary[location].issueTypes[issue.subRequest] = 0;
+                    if (!summary[location].subRequests[issue.subRequest]) {
+                        summary[location].subRequests[issue.subRequest] = [];
                     }
-                    summary[location].issueTypes[issue.subRequest]++;
+                    summary[location].subRequests[issue.subRequest].push(issue);
                 });
 
-                return Object.keys(summary)
-                    .map(location => ({
-                        location,
-                        count: summary[location].count,
-                        issueTypes: Object.entries(summary[location].issueTypes).map(([type, count]) => ({
-                            type,
-                            count
-                        }))
+                return Object.keys(summary).map(location => ({
+                    location,
+                    count: summary[location].issues.length,
+                    subRequests: Object.entries(summary[location].subRequests).map(([subRequest, issues]) => ({
+                        subRequest,
+                        issues
                     }))
-                    .sort((a, b) => b.count - a.count);
+                })).sort((a, b) => b.count - a.count);
             }, [data]);
 
-            // Dashboard statistics
-            const totalIssues = data.issues.length;
-            const openIssues = data.issues.filter(i => i.status === 'Open').length;
-            const closedIssues = data.issues.filter(i => i.status === 'Closed').length;
-            const onHoldIssues = data.issues.filter(i => i.status === 'On Hold').length;
+            const stats = useMemo(() => {
+                const total = data.issues.length;
+                const open = data.issues.filter(i => i.status === 'Open').length;
+                const closed = data.issues.filter(i => i.status === 'Closed').length;
+                const onHold = data.issues.filter(i => i.status === 'On Hold').length;
+                return { total, open, closed, onHold };
+            }, [data]);
+
+            const toggleAssignee = (assignee) => {
+                setExpandedAssignees(prev => ({
+                    ...prev,
+                    [assignee]: !prev[assignee]
+                }));
+            };
+
+            const toggleSubRequest = (key) => {
+                setExpandedSubRequests(prev => ({
+                    ...prev,
+                    [key]: !prev[key]
+                }));
+            };
+
+            const toggleClient = (client) => {
+                setExpandedClients(prev => ({
+                    ...prev,
+                    [client]: !prev[client]
+                }));
+            };
+
+            const toggleLocation = (location) => {
+                setExpandedLocations(prev => ({
+                    ...prev,
+                    [location]: !prev[location]
+                }));
+            };
 
             // Render Dashboard
             const renderDashboard = () => (
-                <div className="animate-slide-up">
-                    {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <div className="gradient-card rounded-2xl p-6 text-white shadow-2xl hover-lift">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-white/80 text-sm font-medium mb-2">Total Issues</p>
-                                    <p className="text-5xl font-black">{totalIssues}</p>
+                <div className="space-y-4">
+                    {assigneeSummary.map((assigneeItem, idx) => (
+                        <div key={idx}>
+                            {/* Assignee Header - Accordion */}
+                            <div
+                                onClick={() => toggleAssignee(assigneeItem.assignedTo)}
+                                className={`accordion-header cursor-pointer rounded-lg p-4 flex items-center justify-between ${
+                                    expandedAssignees[assigneeItem.assignedTo] ? 'expanded' : ''
+                                }`}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <svg 
+                                        className={`w-5 h-5 text-gray-400 chevron ${expandedAssignees[assigneeItem.assignedTo] ? 'expanded' : ''}`}
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                    <span className="text-lg font-bold text-white">{assigneeItem.assignedTo}</span>
+                                    <span className="badge badge-count">{assigneeItem.totalCount}</span>
+                                    <span className="badge badge-age">{assigneeItem.oldestIssueAge}d</span>
                                 </div>
-                                <div className="text-6xl opacity-30">📊</div>
                             </div>
-                        </div>
-                        
-                        <div className="gradient-card-2 rounded-2xl p-6 text-white shadow-2xl hover-lift">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-white/80 text-sm font-medium mb-2">Open Issues</p>
-                                    <p className="text-5xl font-black">{openIssues}</p>
-                                </div>
-                                <div className="text-6xl opacity-30">⚠️</div>
-                            </div>
-                        </div>
-                        
-                        <div className="gradient-card-4 rounded-2xl p-6 text-white shadow-2xl hover-lift">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-white/80 text-sm font-medium mb-2">Closed Issues</p>
-                                    <p className="text-5xl font-black">{closedIssues}</p>
-                                </div>
-                                <div className="text-6xl opacity-30">✅</div>
-                            </div>
-                        </div>
-                        
-                        <div className="gradient-card-3 rounded-2xl p-6 text-white shadow-2xl hover-lift">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-white/80 text-sm font-medium mb-2">On Hold</p>
-                                    <p className="text-5xl font-black">{onHoldIssues}</p>
-                                </div>
-                                <div className="text-6xl opacity-30">⏸️</div>
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Assignee Summary */}
-                    <div className="glass-morphism rounded-2xl p-8 mb-8">
-                        <h2 className="text-3xl font-black mb-6 text-gray-800 flex items-center">
-                            <span className="mr-3">👥</span> Assignee Wise Open Issues Summary
-                        </h2>
-                        
-                        {assigneeSummary.map((assigneeItem, assigneeIdx) => {
-                            // Get all issues for this assignee grouped by sub-request
-                            const assigneeIssues = data.issues.filter(i => 
-                                i.assignedTo === assigneeItem.assignedTo && i.status === 'Open'
-                            );
-                            
-                            // Group issues by sub-request
-                            const groupedBySubRequest = {};
-                            assigneeIssues.forEach(issue => {
-                                const key = issue.subRequest;
-                                if (!groupedBySubRequest[key]) {
-                                    groupedBySubRequest[key] = [];
-                                }
-                                groupedBySubRequest[key].push(issue);
-                            });
-                            
-                            return (
-                                <div key={assigneeIdx} className="mb-6 border-b-2 border-gray-200 pb-6 last:border-b-0">
-                                    {/* Assignee Header */}
-                                    <div className="flex items-center justify-between mb-4 bg-gradient-to-r from-indigo-50 to-purple-50 p-4 rounded-xl">
-                                        <div className="flex items-center gap-4">
-                                            <h3 className="text-2xl font-black text-indigo-700">{assigneeItem.assignedTo}</h3>
-                                            <span className="bg-red-100 text-red-700 px-4 py-2 rounded-full font-bold text-lg">
-                                                {assigneeItem.totalCount} Issues
-                                            </span>
-                                        </div>
-                                        <span className="bg-orange-100 text-orange-700 px-4 py-2 rounded-full font-bold">
-                                            Oldest: {assigneeItem.oldestIssueAge} days
-                                        </span>
-                                    </div>
-                                    
-                                    {/* Sub-request Groups */}
-                                    <div className="space-y-4 ml-4">
-                                        {Object.entries(groupedBySubRequest).map(([subRequest, issues], srIdx) => (
-                                            <div key={srIdx} className="border-l-4 border-indigo-300 pl-4">
+                            {/* Expanded Content */}
+                            {expandedAssignees[assigneeItem.assignedTo] && (
+                                <div className="accordion-content rounded-b-lg p-4 space-y-3 mt-1">
+                                    {assigneeItem.subRequests.map((sr, srIdx) => {
+                                        const subReqKey = `${assigneeItem.assignedTo}-${sr.subRequest}`;
+                                        return (
+                                            <div key={srIdx}>
                                                 {/* Sub-request Header */}
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg font-semibold text-base">
-                                                        {issues.length}
-                                                    </span>
-                                                    <span className="font-bold text-gray-800 text-base">{subRequest}</span>
+                                                <div
+                                                    onClick={() => toggleSubRequest(subReqKey)}
+                                                    className="cursor-pointer bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 flex items-center gap-3 transition"
+                                                >
+                                                    <svg 
+                                                        className={`w-4 h-4 text-gray-500 chevron ${expandedSubRequests[subReqKey] ? 'expanded' : ''}`}
+                                                        fill="none" 
+                                                        stroke="currentColor" 
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                                                    </svg>
+                                                    <span className="badge" style={{background: '#3b82f6', color: 'white'}}>{sr.issues.length}</span>
+                                                    <span className="text-sm font-semibold text-gray-300">{sr.subRequest}</span>
                                                 </div>
-                                                
+
                                                 {/* Individual Issues */}
-                                                <div className="space-y-1 ml-8">
-                                                    {issues.map((issue, issueIdx) => (
-                                                        <div
-                                                            key={issueIdx}
-                                                            onClick={() => setSelectedIssue({ type: 'single', issue: issue })}
-                                                            className="flex items-center justify-between p-3 bg-white hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 rounded-lg cursor-pointer transition border border-gray-200 hover:border-indigo-300 hover:shadow-md"
-                                                        >
-                                                            <div className="flex items-center gap-4 flex-1">
-                                                                <span className="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                                                                    {issue.issueId || `#${issueIdx + 1}`}
-                                                                </span>
-                                                                <span className="font-semibold text-indigo-600 text-sm">
-                                                                    {issue.client}
-                                                                </span>
-                                                                <span className="text-sm text-gray-600">
-                                                                    {issue.issueDetails || 'No details'}
-                                                                </span>
+                                                {expandedSubRequests[subReqKey] && (
+                                                    <div className="ml-8 mt-2 space-y-2">
+                                                        {sr.issues.map((issue, issueIdx) => (
+                                                            <div
+                                                                key={issueIdx}
+                                                                onClick={() => setSelectedIssue({ type: 'single', issue })}
+                                                                className="issue-card cursor-pointer rounded-lg p-3"
+                                                            >
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex items-center gap-3 flex-1">
+                                                                        <span className="text-xs font-mono text-gray-500">{issue.issueId}</span>
+                                                                        <span className="text-sm font-semibold text-blue-400">{issue.client}</span>
+                                                                        <span className="text-xs text-gray-400 truncate max-w-xs">{issue.issueDetails || 'No details'}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-xs font-mono text-gray-500">{issue.vehicleNo}</span>
+                                                                        <span className="text-xs text-gray-500">{issue.location}</span>
+                                                                        <span className="badge badge-age">{issue.age}d</span>
+                                                                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                                                                        </svg>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div className="flex items-center gap-3">
-                                                                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-mono">
-                                                                    {issue.vehicleNo}
-                                                                </span>
-                                                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                                                                    {issue.location}
-                                                                </span>
-                                                                <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded font-bold">
-                                                                    {issue.age}d
-                                                                </span>
-                                                                <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                                                                </svg>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
-                                        ))}
-                                    </div>
+                                        );
+                                    })}
                                 </div>
-                            );
-                        })}
-                    </div>
+                            )}
+                        </div>
+                    ))}
                 </div>
             );
 
             // Render Client Tab
             const renderClientTab = () => (
-                <div className="animate-slide-up">
-                    <div className="glass-morphism rounded-2xl p-8">
-                        <h2 className="text-3xl font-black mb-6 text-gray-800 flex items-center">
-                            <span className="mr-3">🏢</span> Client Wise Open Issues Summary
-                        </h2>
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="border-b-2 border-indigo-500">
-                                        <th className="text-left p-4 font-bold text-indigo-900">Client Name</th>
-                                        <th className="text-left p-4 font-bold text-indigo-900">Total Open Issues</th>
-                                        <th className="text-left p-4 font-bold text-indigo-900">Issue Breakdown</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {clientSummary.map((item, idx) => {
-                                        const clientIssues = data.issues.filter(i => 
-                                            i.client === item.client && i.status === 'Open'
-                                        );
-                                        
+                <div className="space-y-4">
+                    {clientSummary.map((clientItem, idx) => (
+                        <div key={idx}>
+                            <div
+                                onClick={() => toggleClient(clientItem.client)}
+                                className={`accordion-header cursor-pointer rounded-lg p-4 flex items-center justify-between ${
+                                    expandedClients[clientItem.client] ? 'expanded' : ''
+                                }`}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <svg 
+                                        className={`w-5 h-5 text-gray-400 chevron ${expandedClients[clientItem.client] ? 'expanded' : ''}`}
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                    <span className="text-lg font-bold text-white">{clientItem.client}</span>
+                                    <span className="badge badge-count">{clientItem.count}</span>
+                                </div>
+                            </div>
+
+                            {expandedClients[clientItem.client] && (
+                                <div className="accordion-content rounded-b-lg p-4 space-y-3 mt-1">
+                                    {clientItem.subRequests.map((sr, srIdx) => {
+                                        const subReqKey = `client-${clientItem.client}-${sr.subRequest}`;
                                         return (
-                                            <tr key={idx} className="border-b border-gray-200 table-row-hover cursor-pointer"
-                                                onClick={() => setSelectedIssue({ type: 'client', data: item, issues: clientIssues })}>
-                                                <td className="p-4 font-bold text-lg text-indigo-700">{item.client}</td>
-                                                <td className="p-4">
-                                                    <span className="bg-red-100 text-red-700 px-4 py-2 rounded-full font-bold text-lg">
-                                                        {item.count}
-                                                    </span>
-                                                </td>
-                                                <td className="p-4">
-                                                    <div className="space-y-2">
-                                                        {item.issueTypes.map((issue, issueIdx) => (
-                                                            <div key={issueIdx} className="flex items-center">
-                                                                <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg font-semibold text-sm mr-2">
-                                                                    {issue.count}
-                                                                </span>
-                                                                <span className="text-gray-700">{issue.type}</span>
+                                            <div key={srIdx}>
+                                                <div
+                                                    onClick={() => toggleSubRequest(subReqKey)}
+                                                    className="cursor-pointer bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 flex items-center gap-3 transition"
+                                                >
+                                                    <svg 
+                                                        className={`w-4 h-4 text-gray-500 chevron ${expandedSubRequests[subReqKey] ? 'expanded' : ''}`}
+                                                        fill="none" 
+                                                        stroke="currentColor" 
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                                                    </svg>
+                                                    <span className="badge" style={{background: '#3b82f6', color: 'white'}}>{sr.issues.length}</span>
+                                                    <span className="text-sm font-semibold text-gray-300">{sr.subRequest}</span>
+                                                </div>
+
+                                                {expandedSubRequests[subReqKey] && (
+                                                    <div className="ml-8 mt-2 space-y-2">
+                                                        {sr.issues.map((issue, issueIdx) => (
+                                                            <div
+                                                                key={issueIdx}
+                                                                onClick={() => setSelectedIssue({ type: 'single', issue })}
+                                                                className="issue-card cursor-pointer rounded-lg p-3"
+                                                            >
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex items-center gap-3 flex-1">
+                                                                        <span className="text-xs font-mono text-gray-500">{issue.issueId}</span>
+                                                                        <span className="text-sm font-semibold text-blue-400">{issue.assignedTo}</span>
+                                                                        <span className="text-xs text-gray-400 truncate max-w-xs">{issue.issueDetails || 'No details'}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-xs font-mono text-gray-500">{issue.vehicleNo}</span>
+                                                                        <span className="badge badge-age">{issue.age}d</span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         ))}
                                                     </div>
-                                                </td>
-                                            </tr>
+                                                )}
+                                            </div>
                                         );
                                     })}
-                                </tbody>
-                            </table>
+                                </div>
+                            )}
                         </div>
-                    </div>
+                    ))}
                 </div>
             );
 
             // Render Location Tab
             const renderLocationTab = () => (
-                <div className="animate-slide-up">
-                    <div className="glass-morphism rounded-2xl p-8">
-                        <h2 className="text-3xl font-black mb-6 text-gray-800 flex items-center">
-                            <span className="mr-3">📍</span> Location Wise Open Issues Summary
-                        </h2>
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="border-b-2 border-indigo-500">
-                                        <th className="text-left p-4 font-bold text-indigo-900">Location</th>
-                                        <th className="text-left p-4 font-bold text-indigo-900">Total Open Issues</th>
-                                        <th className="text-left p-4 font-bold text-indigo-900">Issue Breakdown</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {locationSummary.map((item, idx) => {
-                                        const locationIssues = data.issues.filter(i => 
-                                            (i.location || 'Unknown') === item.location && i.status === 'Open'
-                                        );
-                                        
+                <div className="space-y-4">
+                    {locationSummary.map((locationItem, idx) => (
+                        <div key={idx}>
+                            <div
+                                onClick={() => toggleLocation(locationItem.location)}
+                                className={`accordion-header cursor-pointer rounded-lg p-4 flex items-center justify-between ${
+                                    expandedLocations[locationItem.location] ? 'expanded' : ''
+                                }`}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <svg 
+                                        className={`w-5 h-5 text-gray-400 chevron ${expandedLocations[locationItem.location] ? 'expanded' : ''}`}
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                    <span className="text-lg font-bold text-white">{locationItem.location}</span>
+                                    <span className="badge badge-count">{locationItem.count}</span>
+                                </div>
+                            </div>
+
+                            {expandedLocations[locationItem.location] && (
+                                <div className="accordion-content rounded-b-lg p-4 space-y-3 mt-1">
+                                    {locationItem.subRequests.map((sr, srIdx) => {
+                                        const subReqKey = `location-${locationItem.location}-${sr.subRequest}`;
                                         return (
-                                            <tr key={idx} className="border-b border-gray-200 table-row-hover cursor-pointer"
-                                                onClick={() => setSelectedIssue({ type: 'location', data: item, issues: locationIssues })}>
-                                                <td className="p-4 font-bold text-lg text-indigo-700">{item.location}</td>
-                                                <td className="p-4">
-                                                    <span className="bg-red-100 text-red-700 px-4 py-2 rounded-full font-bold text-lg">
-                                                        {item.count}
-                                                    </span>
-                                                </td>
-                                                <td className="p-4">
-                                                    <div className="space-y-2">
-                                                        {item.issueTypes.map((issue, issueIdx) => (
-                                                            <div key={issueIdx} className="flex items-center">
-                                                                <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg font-semibold text-sm mr-2">
-                                                                    {issue.count}
-                                                                </span>
-                                                                <span className="text-gray-700">{issue.type}</span>
+                                            <div key={srIdx}>
+                                                <div
+                                                    onClick={() => toggleSubRequest(subReqKey)}
+                                                    className="cursor-pointer bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 flex items-center gap-3 transition"
+                                                >
+                                                    <svg 
+                                                        className={`w-4 h-4 text-gray-500 chevron ${expandedSubRequests[subReqKey] ? 'expanded' : ''}`}
+                                                        fill="none" 
+                                                        stroke="currentColor" 
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                                                    </svg>
+                                                    <span className="badge" style={{background: '#3b82f6', color: 'white'}}>{sr.issues.length}</span>
+                                                    <span className="text-sm font-semibold text-gray-300">{sr.subRequest}</span>
+                                                </div>
+
+                                                {expandedSubRequests[subReqKey] && (
+                                                    <div className="ml-8 mt-2 space-y-2">
+                                                        {sr.issues.map((issue, issueIdx) => (
+                                                            <div
+                                                                key={issueIdx}
+                                                                onClick={() => setSelectedIssue({ type: 'single', issue })}
+                                                                className="issue-card cursor-pointer rounded-lg p-3"
+                                                            >
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex items-center gap-3 flex-1">
+                                                                        <span className="text-xs font-mono text-gray-500">{issue.issueId}</span>
+                                                                        <span className="text-sm font-semibold text-blue-400">{issue.client}</span>
+                                                                        <span className="text-xs text-gray-400 truncate max-w-xs">{issue.issueDetails || 'No details'}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-xs font-mono text-gray-500">{issue.vehicleNo}</span>
+                                                                        <span className="badge badge-age">{issue.age}d</span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         ))}
                                                     </div>
-                                                </td>
-                                            </tr>
+                                                )}
+                                            </div>
                                         );
                                     })}
-                                </tbody>
-                            </table>
+                                </div>
+                            )}
                         </div>
-                    </div>
+                    ))}
                 </div>
             );
 
             if (loading) {
                 return (
-                    <div className="flex flex-col items-center justify-center min-h-screen">
-                        <div className="loading-spinner"></div>
-                        <p className="mt-6 text-2xl font-bold text-gray-700">Loading data from Google Sheets...</p>
-                        <p className="mt-2 text-sm text-gray-500">Please wait while we fetch your live data</p>
+                    <div className="min-h-screen flex items-center justify-center">
+                        <div className="text-center">
+                            <div className="loading-spinner mx-auto mb-4"></div>
+                            <p className="text-gray-400">Loading data...</p>
+                        </div>
                     </div>
                 );
             }
 
             if (error) {
                 return (
-                    <div className="flex flex-col items-center justify-center min-h-screen p-8">
-                        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg max-w-2xl">
-                            <h2 className="text-2xl font-bold mb-4">⚠️ Error Loading Data</h2>
-                            <p className="mb-4">{error}</p>
-                            <div className="bg-white p-4 rounded mt-4">
-                                <p className="font-semibold mb-2">Please ensure:</p>
-                                <ul className="list-disc list-inside space-y-1 text-sm">
-                                    <li>The Google Sheet is set to "Anyone with the link can view"</li>
-                                    <li>The sheet ID is correct: 1DzW-6Q7hTNn2hSJbEHOkSrbalOmbDIftdjw4I_PhEdA</li>
-                                    <li>The tab name is exactly: "Issues- Realtime"</li>
-                                </ul>
-                            </div>
+                    <div className="min-h-screen flex items-center justify-center p-8">
+                        <div className="bg-red-900/20 border border-red-500 rounded-lg p-6 max-w-2xl">
+                            <h2 className="text-xl font-bold text-red-400 mb-4">Error Loading Data</h2>
+                            <p className="text-gray-300 mb-4">{error}</p>
                             <button 
                                 onClick={fetchSheetData}
-                                className="mt-4 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-bold"
+                                className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-semibold transition"
                             >
-                                🔄 Retry
+                                Retry
                             </button>
                         </div>
                     </div>
@@ -635,21 +665,123 @@
             }
 
             return (
-                <div className="min-h-screen">
-                    {/* Modal for Issue Details */}
-                    {selectedIssue && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedIssue(null)}>
-                            <div className="glass-morphism rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="flex h-screen">
+                    {/* Sidebar */}
+                    <div className="sidebar w-64 flex-shrink-0 p-4">
+                        <div className="mb-8">
+                            <h1 className="text-2xl font-black text-white flex items-center gap-2">
+                                cautio
+                                <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">BETA</span>
+                            </h1>
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="text-xs uppercase text-gray-500 font-semibold mb-2 px-3">MENU</div>
+                            
+                            <div
+                                onClick={() => setActiveTab('dashboard')}
+                                className={`menu-item cursor-pointer px-3 py-2 rounded-lg flex items-center gap-3 ${
+                                    activeTab === 'dashboard' ? 'active' : ''
+                                }`}
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                                <span className="font-semibold">Dashboard</span>
+                            </div>
+
+                            <div
+                                onClick={() => setActiveTab('client')}
+                                className={`menu-item cursor-pointer px-3 py-2 rounded-lg flex items-center gap-3 ${
+                                    activeTab === 'client' ? 'active' : ''
+                                }`}
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                                <span className="font-semibold">Client Wise</span>
+                            </div>
+
+                            <div
+                                onClick={() => setActiveTab('location')}
+                                className={`menu-item cursor-pointer px-3 py-2 rounded-lg flex items-center gap-3 ${
+                                    activeTab === 'location' ? 'active' : ''
+                                }`}
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span className="font-semibold">Location Wise</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="flex-1 overflow-y-auto">
+                        {/* Header */}
+                        <div className="bg-zinc-900 border-b border-zinc-800 p-4 sticky top-0 z-10">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-xl font-bold text-white">Issue Tracking Dashboard</h2>
+                                    {lastUpdated && (
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Last updated: {lastUpdated.toLocaleTimeString()}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={fetchSheetData}
+                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition text-sm"
+                                    >
+                                        🔄 Refresh
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Stats */}
+                        <div className="p-6">
+                            <div className="grid grid-cols-4 gap-4 mb-6">
+                                <div className="stats-card rounded-lg p-4">
+                                    <div className="text-sm text-gray-400 mb-1">Total Issues</div>
+                                    <div className="text-3xl font-bold text-white">{stats.total}</div>
+                                </div>
+                                <div className="stats-card rounded-lg p-4">
+                                    <div className="text-sm text-gray-400 mb-1">Open</div>
+                                    <div className="text-3xl font-bold text-red-400">{stats.open}</div>
+                                </div>
+                                <div className="stats-card rounded-lg p-4">
+                                    <div className="text-sm text-gray-400 mb-1">Closed</div>
+                                    <div className="text-3xl font-bold text-green-400">{stats.closed}</div>
+                                </div>
+                                <div className="stats-card rounded-lg p-4">
+                                    <div className="text-sm text-gray-400 mb-1">On Hold</div>
+                                    <div className="text-3xl font-bold text-yellow-400">{stats.onHold}</div>
+                                </div>
+                            </div>
+
+                            {/* Content Area */}
+                            {activeTab === 'dashboard' && renderDashboard()}
+                            {activeTab === 'client' && renderClientTab()}
+                            {activeTab === 'location' && renderLocationTab()}
+                        </div>
+                    </div>
+
+                    {/* Issue Detail Modal */}
+                    {selectedIssue && selectedIssue.type === 'single' && (
+                        <div className="modal-overlay fixed inset-0 flex items-center justify-center z-50 p-4" onClick={() => setSelectedIssue(null)}>
+                            <div className="modal-content rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                                 {/* Modal Header */}
-                                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-2xl flex justify-between items-center sticky top-0 z-10">
-                                    <h2 className="text-2xl font-black">
-                                        {selectedIssue.type === 'assignee' && `👤 ${selectedIssue.data.assignedTo} - All Issues`}
-                                        {selectedIssue.type === 'client' && `🏢 ${selectedIssue.data.client} - All Issues`}
-                                        {selectedIssue.type === 'location' && `📍 ${selectedIssue.data.location} - All Issues`}
-                                    </h2>
+                                <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-t-xl flex justify-between items-center sticky top-0 z-10">
+                                    <div>
+                                        <h2 className="text-xl font-bold text-white">Issue Details</h2>
+                                        <p className="text-sm text-blue-100 mt-1">ID: {selectedIssue.issue.issueId}</p>
+                                    </div>
                                     <button 
                                         onClick={() => setSelectedIssue(null)}
-                                        className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition"
+                                        className="text-white hover:bg-white/20 rounded-lg p-2 transition"
                                     >
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -659,142 +791,38 @@
 
                                 {/* Modal Content */}
                                 <div className="p-6">
-                                    <div className="mb-4 flex gap-4">
-                                        <span className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold">
-                                            Total Issues: {selectedIssue.issues.length}
-                                        </span>
-                                        {selectedIssue.type === 'assignee' && (
-                                            <span className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg font-bold">
-                                                Oldest: {selectedIssue.data.oldestIssueAge} days
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {/* Issues Table */}
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full">
-                                            <thead>
-                                                <tr className="bg-gray-100 border-b-2 border-indigo-500">
-                                                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Issue ID</th>
-                                                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Client</th>
-                                                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Issue Type</th>
-                                                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Details</th>
-                                                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Vehicle No</th>
-                                                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Location</th>
-                                                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Raised By</th>
-                                                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Raised Date</th>
-                                                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Age</th>
-                                                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Status</th>
-                                                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {selectedIssue.issues.map((issue, idx) => (
-                                                    <tr key={idx} className="border-b border-gray-200 hover:bg-indigo-50 transition">
-                                                        <td className="p-3 text-sm font-mono">{issue.issueId}</td>
-                                                        <td className="p-3 text-sm font-semibold">{issue.client}</td>
-                                                        <td className="p-3 text-sm">{issue.subRequest}</td>
-                                                        <td className="p-3 text-sm max-w-xs truncate" title={issue.issueDetails}>
-                                                            {issue.issueDetails || '-'}
-                                                        </td>
-                                                        <td className="p-3 text-sm font-mono">{issue.vehicleNo}</td>
-                                                        <td className="p-3 text-sm">{issue.location}</td>
-                                                        <td className="p-3 text-sm">{issue.raisedBy || '-'}</td>
-                                                        <td className="p-3 text-sm whitespace-nowrap">
-                                                            {issue.createdDate ? new Date(issue.createdDate).toLocaleDateString() : '-'}
-                                                        </td>
-                                                        <td className="p-3 text-sm">
-                                                            <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold">
-                                                                {issue.age}d
-                                                            </span>
-                                                        </td>
-                                                        <td className="p-3 text-sm">
-                                                            <span className={`px-2 py-1 rounded text-xs font-bold ${
-                                                                issue.status === 'Open' ? 'bg-red-100 text-red-700' :
-                                                                issue.status === 'Closed' ? 'bg-green-100 text-green-700' :
-                                                                'bg-yellow-100 text-yellow-700'
-                                                            }`}>
-                                                                {issue.status}
-                                                            </span>
-                                                        </td>
-                                                        <td className="p-3 text-sm">
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    // Open detailed single issue view
-                                                                    setSelectedIssue({ type: 'single', issue: issue });
-                                                                }}
-                                                                className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition text-xs font-semibold"
-                                                            >
-                                                                View Full
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Single Issue Detail Modal */}
-                    {selectedIssue && selectedIssue.type === 'single' && (
-                        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={() => setSelectedIssue(null)}>
-                            <div className="glass-morphism rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                                {/* Single Issue Header */}
-                                <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 rounded-t-2xl flex justify-between items-center sticky top-0 z-10">
-                                    <div>
-                                        <h2 className="text-2xl font-black">🔍 Issue Details</h2>
-                                        <p className="text-sm opacity-90 mt-1">Issue ID: {selectedIssue.issue.issueId}</p>
-                                    </div>
-                                    <button 
-                                        onClick={() => setSelectedIssue(null)}
-                                        className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition"
-                                    >
-                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-
-                                {/* Single Issue Content */}
-                                <div className="p-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Basic Information */}
+                                    <div className="grid grid-cols-2 gap-6">
+                                        {/* Basic Info */}
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-bold text-gray-800 border-b-2 border-indigo-500 pb-2">📋 Basic Information</h3>
+                                            <h3 className="text-sm font-bold text-blue-400 uppercase mb-3">Basic Information</h3>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Issue ID</label>
-                                                <p className="text-base font-mono font-bold text-gray-800">{selectedIssue.issue.issueId || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Issue ID</label>
+                                                <p className="text-white font-mono">{selectedIssue.issue.issueId || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Client</label>
-                                                <p className="text-base font-bold text-indigo-600">{selectedIssue.issue.client || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Client</label>
+                                                <p className="text-white font-semibold">{selectedIssue.issue.client || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Issue Type / Sub-request</label>
-                                                <p className="text-base font-semibold text-gray-800">{selectedIssue.issue.subRequest || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Issue Type</label>
+                                                <p className="text-white">{selectedIssue.issue.subRequest || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Issue Details</label>
-                                                <p className="text-base text-gray-700 bg-gray-50 p-3 rounded-lg">
-                                                    {selectedIssue.issue.issueDetails || 'No details provided'}
-                                                </p>
+                                                <label className="text-xs text-gray-500 uppercase">Issue Details</label>
+                                                <p className="text-gray-300 bg-zinc-900 p-3 rounded-lg">{selectedIssue.issue.issueDetails || 'No details'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Status</label>
+                                                <label className="text-xs text-gray-500 uppercase">Status</label>
                                                 <div className="mt-1">
-                                                    <span className={`px-4 py-2 rounded-lg font-bold ${
-                                                        selectedIssue.issue.status === 'Open' ? 'bg-red-100 text-red-700' :
-                                                        selectedIssue.issue.status === 'Closed' ? 'bg-green-100 text-green-700' :
-                                                        'bg-yellow-100 text-yellow-700'
+                                                    <span className={`badge ${
+                                                        selectedIssue.issue.status === 'Open' ? 'badge-count' :
+                                                        selectedIssue.issue.status === 'Closed' ? 'badge-status' :
+                                                        'badge-age'
                                                     }`}>
                                                         {selectedIssue.issue.status}
                                                     </span>
@@ -802,106 +830,96 @@
                                             </div>
                                         </div>
 
-                                        {/* Assignment & Tracking */}
+                                        {/* Assignment */}
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-bold text-gray-800 border-b-2 border-purple-500 pb-2">👥 Assignment & Tracking</h3>
+                                            <h3 className="text-sm font-bold text-purple-400 uppercase mb-3">Assignment & Tracking</h3>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Assigned To</label>
-                                                <p className="text-base font-bold text-purple-600">{selectedIssue.issue.assignedTo || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Assigned To</label>
+                                                <p className="text-white font-semibold">{selectedIssue.issue.assignedTo || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Raised By</label>
-                                                <p className="text-base text-gray-800">{selectedIssue.issue.raisedBy || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Raised By</label>
+                                                <p className="text-gray-300">{selectedIssue.issue.raisedBy || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Raised Via</label>
-                                                <p className="text-base text-gray-800">{selectedIssue.issue.raisedVia || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Raised Via</label>
+                                                <p className="text-gray-300">{selectedIssue.issue.raisedVia || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Responsible Person</label>
-                                                <p className="text-base text-gray-800">{selectedIssue.issue.responsiblePerson || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Responsible Person</label>
+                                                <p className="text-gray-300">{selectedIssue.issue.responsiblePerson || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">JIRA Ticket ID</label>
-                                                <p className="text-base font-mono text-gray-800">{selectedIssue.issue.jiraTicketId || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">JIRA Ticket</label>
+                                                <p className="text-gray-300 font-mono">{selectedIssue.issue.jiraTicketId || '-'}</p>
                                             </div>
                                         </div>
 
-                                        {/* Location & Vehicle */}
+                                        {/* Location */}
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-bold text-gray-800 border-b-2 border-green-500 pb-2">📍 Location & Vehicle</h3>
+                                            <h3 className="text-sm font-bold text-green-400 uppercase mb-3">Location & Vehicle</h3>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Vehicle Number</label>
-                                                <p className="text-base font-mono font-bold text-gray-800">{selectedIssue.issue.vehicleNo || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Vehicle Number</label>
+                                                <p className="text-white font-mono font-bold">{selectedIssue.issue.vehicleNo || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Location</label>
-                                                <p className="text-base font-semibold text-gray-800">{selectedIssue.issue.location || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Location</label>
+                                                <p className="text-gray-300">{selectedIssue.issue.location || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Area</label>
-                                                <p className="text-base text-gray-800">{selectedIssue.issue.area || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Area</label>
+                                                <p className="text-gray-300">{selectedIssue.issue.area || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">City</label>
-                                                <p className="text-base text-gray-800">{selectedIssue.issue.city || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">City</label>
+                                                <p className="text-gray-300">{selectedIssue.issue.city || '-'}</p>
                                             </div>
                                         </div>
 
-                                        {/* Timeline & Resolution */}
+                                        {/* Timeline */}
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-bold text-gray-800 border-b-2 border-orange-500 pb-2">⏱️ Timeline & Resolution</h3>
+                                            <h3 className="text-sm font-bold text-orange-400 uppercase mb-3">Timeline & Resolution</h3>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Timestamp - Issue Raised</label>
-                                                <p className="text-base text-gray-800">{selectedIssue.issue.createdDate || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Issue Raised</label>
+                                                <p className="text-gray-300">{selectedIssue.issue.createdDate || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Timestamp - Issue Resolved</label>
-                                                <p className="text-base text-gray-800">{selectedIssue.issue.resolvedDate || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Issue Resolved</label>
+                                                <p className="text-gray-300">{selectedIssue.issue.resolvedDate || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Age (Days)</label>
-                                                <span className="inline-block bg-orange-100 text-orange-700 px-4 py-2 rounded-lg font-bold text-lg">
-                                                    {selectedIssue.issue.age} days
-                                                </span>
+                                                <label className="text-xs text-gray-500 uppercase">Age (Days)</label>
+                                                <p className="text-orange-400 font-bold text-lg">{selectedIssue.issue.age} days</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Next Follow Up Date</label>
-                                                <p className="text-base text-gray-800">{selectedIssue.issue.nextFollowUpDate || '-'}</p>
+                                                <label className="text-xs text-gray-500 uppercase">Next Follow Up</label>
+                                                <p className="text-gray-300">{selectedIssue.issue.nextFollowUpDate || '-'}</p>
                                             </div>
                                             
                                             <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">Date - Current Status</label>
-                                                <p className="text-base text-gray-800">{selectedIssue.issue.dateCurrentStatus || '-'}</p>
-                                            </div>
-                                            
-                                            <div>
-                                                <label className="text-xs font-semibold text-gray-500 uppercase">How was it corrected?</label>
-                                                <p className="text-base text-gray-700 bg-gray-50 p-3 rounded-lg">
-                                                    {selectedIssue.issue.howCorrected || 'Not yet corrected'}
-                                                </p>
+                                                <label className="text-xs text-gray-500 uppercase">How Corrected</label>
+                                                <p className="text-gray-300 bg-zinc-900 p-3 rounded-lg">{selectedIssue.issue.howCorrected || 'Not yet corrected'}</p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Close Button */}
                                     <div className="mt-6 flex justify-end">
                                         <button
                                             onClick={() => setSelectedIssue(null)}
-                                            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold hover:from-purple-600 hover:to-pink-600 transition shadow-lg"
+                                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition"
                                         >
                                             Close
                                         </button>
@@ -910,83 +928,11 @@
                             </div>
                         </div>
                     )}
-
-                    {/* Header */}
-                    <header className="glass-morphism shadow-2xl mb-8 sticky top-0 z-50 border-b-4 border-indigo-500">
-                        <div className="container mx-auto px-6 py-6">
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-2">
-                                        CAUTIO
-                                    </h1>
-                                    <p className="text-gray-600 font-semibold">Professional Issue Tracking System</p>
-                                    {lastUpdated && (
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            🕒 Last updated: {lastUpdated.toLocaleString()}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="text-right">
-                                    <button
-                                        onClick={fetchSheetData}
-                                        disabled={loading}
-                                        className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl hover:from-indigo-600 hover:to-purple-600 transition font-bold shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50"
-                                    >
-                                        🔄 Refresh Data
-                                    </button>
-                                    <p className="text-xs text-gray-500 mt-2">Auto-refresh every 5 minutes</p>
-                                    <div className="mt-2">
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                            <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                                            Live Data
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </header>
-
-                    {/* Navigation Tabs */}
-                    <div className="container mx-auto px-6 mb-8">
-                        <div className="flex gap-4">
-                            {['dashboard', 'client', 'location'].map(tab => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveTab(tab)}
-                                    className={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 ${
-                                        activeTab === tab 
-                                            ? 'tab-active' 
-                                            : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
-                                    }`}
-                                >
-                                    {tab === 'dashboard' && '📊 Dashboard'}
-                                    {tab === 'client' && '🏢 Client Wise'}
-                                    {tab === 'location' && '📍 Location Wise'}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Main Content */}
-                    <div className="container mx-auto px-6 pb-12">
-                        {activeTab === 'dashboard' && renderDashboard()}
-                        {activeTab === 'client' && renderClientTab()}
-                        {activeTab === 'location' && renderLocationTab()}
-                    </div>
-
-                    {/* Footer */}
-                    <footer className="bg-gradient-to-r from-indigo-900 to-purple-900 text-white py-8 mt-12">
-                        <div className="container mx-auto px-6 text-center">
-                            <p className="text-sm font-semibold">© 2024 Cautio. Professional Issue Tracking System | Version 2.0</p>
-                            <p className="text-xs mt-2 opacity-75">Powered by Live Google Sheets Integration</p>
-                        </div>
-                    </footer>
                 </div>
             );
         };
 
-        // Render the app
-        ReactDOM.render(<CautioIssueTracker />, document.getElementById('root'));
+        ReactDOM.render(<CautioTracker />, document.getElementById('root'));
     </script>
 </body>
 </html>
