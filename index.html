@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cautio - Professional Issue Tracker</title>
+    <title>Cautio - Live Issue Tracker</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
@@ -78,6 +79,20 @@
         .animate-slide-up {
             animation: slideUp 0.5s ease-out forwards;
         }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen">
@@ -86,470 +101,272 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // Complete Sample Data based on screenshots
-        const sampleData = {
-            issues: [
-                // Vikas Issues - Total 19 (Based on screenshot)
-                { id: 1, assignedTo: 'Vikas', client: '3EV / 3Eco', subRequest: 'Alert Data Issue', issueDetails: 'Alert not generated', status: 'Open', createdDate: '2024-11-20', vehicleNo: 'MH12AB1234', location: 'Mumbai' },
-                { id: 2, assignedTo: 'Vikas', client: 'CF-Mumbai', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-19', vehicleNo: 'MH12CD5678', location: 'Mumbai' },
-                { id: 3, assignedTo: 'Vikas', client: 'CF-Mumbai', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-18', vehicleNo: 'MH12EF9012', location: 'Mumbai' },
-                { id: 4, assignedTo: 'Vikas', client: 'Infants', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-17', vehicleNo: 'DL01AB3456', location: 'Delhi' },
-                { id: 5, assignedTo: 'Vikas', client: 'Vozi', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-16', vehicleNo: 'KA01CD7890', location: 'Bangalore' },
-                { id: 6, assignedTo: 'Vikas', client: 'Shofr-Bangalore', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-15', vehicleNo: 'KA02EF1234', location: 'Bangalore' },
-                { id: 7, assignedTo: 'Vikas', client: 'OHM Mobility', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-14', vehicleNo: 'TN01GH5678', location: 'Chennai' },
-                { id: 8, assignedTo: 'Vikas', client: 'Euro-Blr', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-13', vehicleNo: 'KA03IJ9012', location: 'Bangalore' },
-                { id: 9, assignedTo: 'Vikas', client: 'Zingbus', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-12', vehicleNo: 'HR01KL3456', location: 'Gurgaon' },
-                { id: 10, assignedTo: 'Vikas', client: 'Steel House', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-11', vehicleNo: 'PB01MN7890', location: 'Punjab' },
-                { id: 11, assignedTo: 'Vikas', client: 'G4S', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-10', vehicleNo: 'DL02OP1234', location: 'Delhi' },
-                { id: 12, assignedTo: 'Vikas', client: 'Euro-Delhi', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-09', vehicleNo: 'DL03QR5678', location: 'Delhi' },
-                { id: 13, assignedTo: 'Vikas', client: 'Green Drive Mobility', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-11-08', vehicleNo: 'MH13ST9012', location: 'Mumbai' },
-                { id: 14, assignedTo: 'Vikas', client: '3EV / 3Eco', subRequest: 'Full Black/Grey/White Video Screen', issueDetails: '', status: 'Open', createdDate: '2024-10-18', vehicleNo: 'MH14UV3456', location: 'Mumbai' },
-                { id: 15, assignedTo: 'Vikas', client: '3EV / 3Eco', subRequest: 'Full Black/Grey/White Video Screen', issueDetails: '', status: 'Open', createdDate: '2024-10-17', vehicleNo: 'MH15WX7890', location: 'Mumbai' },
-                { id: 16, assignedTo: 'Vikas', client: '3EV / 3Eco', subRequest: 'Device Offline Issue', issueDetails: 'Lights are not coming', status: 'Open', createdDate: '2024-10-16', vehicleNo: 'MH16YZ1234', location: 'Mumbai' },
-                { id: 17, assignedTo: 'Vikas', client: '3EV / 3Eco', subRequest: 'Camera hanging Issue', issueDetails: '', status: 'Open', createdDate: '2024-10-15', vehicleNo: 'MH17AB5678', location: 'Mumbai' },
-                { id: 18, assignedTo: 'Vikas', client: 'CF-Mumbai', subRequest: 'Camera hanging Issue', issueDetails: '', status: 'Open', createdDate: '2024-10-14', vehicleNo: 'MH18CD9012', location: 'Mumbai' },
-                { id: 19, assignedTo: 'Vikas', client: 'Infants', subRequest: 'Camera hanging Issue', issueDetails: '', status: 'Open', createdDate: '2024-10-13', vehicleNo: 'DL04EF3456', location: 'Delhi' },
-
-                // Balaram Issues - Total 45 (Based on screenshot)
-                { id: 20, assignedTo: 'Balaram', client: '3EV / 3Eco', subRequest: 'Alert Data Issue', issueDetails: 'Alert not generated', status: 'Open', createdDate: '2024-08-23', vehicleNo: 'TN02AB1234', location: 'Chennai' },
-                { id: 21, assignedTo: 'Balaram', client: 'CF-Mumbai', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-08-22', vehicleNo: 'MH19GH5678', location: 'Mumbai' },
-                { id: 22, assignedTo: 'Balaram', client: 'Infants', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-21', vehicleNo: 'DL05IJ9012', location: 'Delhi' },
-                { id: 23, assignedTo: 'Balaram', client: 'Infants', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-20', vehicleNo: 'DL06KL3456', location: 'Delhi' },
-                { id: 24, assignedTo: 'Balaram', client: 'Vozi', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-19', vehicleNo: 'KA04MN7890', location: 'Bangalore' },
-                { id: 25, assignedTo: 'Balaram', client: 'Vozi', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-18', vehicleNo: 'KA05OP1234', location: 'Bangalore' },
-                { id: 26, assignedTo: 'Balaram', client: 'Shofr-Bangalore', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-17', vehicleNo: 'KA06QR5678', location: 'Bangalore' },
-                { id: 27, assignedTo: 'Balaram', client: 'Shofr-Bangalore', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-16', vehicleNo: 'KA07ST9012', location: 'Bangalore' },
-                { id: 28, assignedTo: 'Balaram', client: 'OHM Mobility', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-15', vehicleNo: 'TN03UV3456', location: 'Chennai' },
-                { id: 29, assignedTo: 'Balaram', client: 'OHM Mobility', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-14', vehicleNo: 'TN04WX7890', location: 'Chennai' },
-                { id: 30, assignedTo: 'Balaram', client: 'Euro-Blr', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-13', vehicleNo: 'KA08YZ1234', location: 'Bangalore' },
-                { id: 31, assignedTo: 'Balaram', client: 'Zingbus', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-12', vehicleNo: 'HR02AB5678', location: 'Gurgaon' },
-                { id: 32, assignedTo: 'Balaram', client: 'Green Drive Mobility', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-11', vehicleNo: 'MH20CD9012', location: 'Mumbai' },
-                { id: 33, assignedTo: 'Balaram', client: 'Skoolify', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-08-10', vehicleNo: 'KA09EF3456', location: 'Bangalore' },
-                { id: 34, assignedTo: 'Balaram', client: '3EV / 3Eco', subRequest: 'Full Black/Grey/White Video Screen', issueDetails: '', status: 'Open', createdDate: '2024-08-09', vehicleNo: 'MH21GH7890', location: 'Mumbai' },
-                { id: 35, assignedTo: 'Balaram', client: '3EV / 3Eco', subRequest: 'Full Black/Grey/White Video Screen', issueDetails: '', status: 'Open', createdDate: '2024-08-08', vehicleNo: 'MH22IJ1234', location: 'Mumbai' },
-                { id: 36, assignedTo: 'Balaram', client: 'CF-Mumbai', subRequest: 'Full Black/Grey/White Video Screen', issueDetails: '', status: 'Open', createdDate: '2024-08-07', vehicleNo: 'MH23KL5678', location: 'Mumbai' },
-                { id: 37, assignedTo: 'Balaram', client: 'CF-Mumbai', subRequest: 'Full Black/Grey/White Video Screen', issueDetails: '', status: 'Open', createdDate: '2024-08-06', vehicleNo: 'MH24MN9012', location: 'Mumbai' },
-                { id: 38, assignedTo: 'Balaram', client: 'Infants', subRequest: 'Full Black/Grey/White Video Screen', issueDetails: '', status: 'Open', createdDate: '2024-08-05', vehicleNo: 'DL07OP3456', location: 'Delhi' },
-                { id: 39, assignedTo: 'Balaram', client: 'Infants', subRequest: 'Full Black/Grey/White Video Screen', issueDetails: '', status: 'Open', createdDate: '2024-08-04', vehicleNo: 'DL08QR7890', location: 'Delhi' },
-                { id: 40, assignedTo: 'Balaram', client: 'Vozi', subRequest: 'Full Black/Grey/White Video Screen', issueDetails: '', status: 'Open', createdDate: '2024-08-03', vehicleNo: 'KA10ST1234', location: 'Bangalore' },
-                { id: 41, assignedTo: 'Balaram', client: 'CF-Mumbai', subRequest: 'GPS Module Failure', issueDetails: 'GNSS Module Fault', status: 'Open', createdDate: '2024-08-02', vehicleNo: 'MH25UV5678', location: 'Mumbai' },
-                { id: 42, assignedTo: 'Balaram', client: 'Infants', subRequest: 'GPS Module Failure', issueDetails: 'GNSS Module Fault', status: 'Open', createdDate: '2024-08-01', vehicleNo: 'DL09WX9012', location: 'Delhi' },
-                { id: 43, assignedTo: 'Balaram', client: 'Infants', subRequest: 'GPS Module Failure', issueDetails: 'GNSS Module Fault', status: 'Open', createdDate: '2024-07-31', vehicleNo: 'DL10YZ3456', location: 'Delhi' },
-                { id: 44, assignedTo: 'Balaram', client: 'Vozi', subRequest: 'GPS Module Failure', issueDetails: 'GNSS Module Fault', status: 'Open', createdDate: '2024-07-30', vehicleNo: 'KA11AB7890', location: 'Bangalore' },
-                { id: 45, assignedTo: 'Balaram', client: 'Vozi', subRequest: 'Live Video Issue', issueDetails: '', status: 'Open', createdDate: '2024-07-29', vehicleNo: 'KA12CD1234', location: 'Bangalore' },
-                { id: 46, assignedTo: 'Balaram', client: 'Euro-Blr', subRequest: 'Live Video Issue', issueDetails: '', status: 'Open', createdDate: '2024-07-28', vehicleNo: 'KA13EF5678', location: 'Bangalore' },
-                { id: 47, assignedTo: 'Balaram', client: 'CF-Mumbai', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-27', vehicleNo: 'MH26GH9012', location: 'Mumbai' },
-                { id: 48, assignedTo: 'Balaram', client: 'CF-Mumbai', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-26', vehicleNo: 'MH27IJ3456', location: 'Mumbai' },
-                { id: 49, assignedTo: 'Balaram', client: 'Infants', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-25', vehicleNo: 'DL11KL7890', location: 'Delhi' },
-                { id: 50, assignedTo: 'Balaram', client: 'Infants', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-24', vehicleNo: 'DL12MN1234', location: 'Delhi' },
-                { id: 51, assignedTo: 'Balaram', client: 'Infants', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-23', vehicleNo: 'DL13OP5678', location: 'Delhi' },
-                { id: 52, assignedTo: 'Balaram', client: 'Vozi', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-22', vehicleNo: 'KA14QR9012', location: 'Bangalore' },
-                { id: 53, assignedTo: 'Balaram', client: 'Shofr-Bangalore', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-21', vehicleNo: 'KA15ST3456', location: 'Bangalore' },
-                { id: 54, assignedTo: 'Balaram', client: 'OHM Mobility', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-20', vehicleNo: 'TN05UV7890', location: 'Chennai' },
-                { id: 55, assignedTo: 'Balaram', client: 'Steel House', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-19', vehicleNo: 'PB02WX1234', location: 'Punjab' },
-                { id: 56, assignedTo: 'Balaram', client: 'Steel House', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-18', vehicleNo: 'PB03YZ5678', location: 'Punjab' },
-                { id: 57, assignedTo: 'Balaram', client: 'Steel House', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-17', vehicleNo: 'PB04AB9012', location: 'Punjab' },
-                { id: 58, assignedTo: 'Balaram', client: 'G4S', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-16', vehicleNo: 'DL14CD3456', location: 'Delhi' },
-                { id: 59, assignedTo: 'Balaram', client: 'Green Cell Express', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-15', vehicleNo: 'MH28EF7890', location: 'Mumbai' },
-                { id: 60, assignedTo: 'Balaram', client: 'Shofr-Delhi', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-14', vehicleNo: 'DL15GH1234', location: 'Delhi' },
-                { id: 61, assignedTo: 'Balaram', client: 'Trev', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-13', vehicleNo: 'KA16IJ5678', location: 'Bangalore' },
-                { id: 62, assignedTo: 'Balaram', client: 'Waves', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-12', vehicleNo: 'MH29KL9012', location: 'Mumbai' },
-                { id: 63, assignedTo: 'Balaram', client: 'Vozi', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-07-11', vehicleNo: 'KA17MN3456', location: 'Bangalore' },
-                { id: 64, assignedTo: 'Balaram', client: 'Infants', subRequest: 'Power Cables Issue', issueDetails: 'Power cable is tampered', status: 'Open', createdDate: '2024-07-10', vehicleNo: 'DL16OP7890', location: 'Delhi' },
-
-                // Brijesh Issues - Total 11 (Based on screenshot)
-                { id: 65, assignedTo: 'Brijesh', client: '3EV / 3Eco', subRequest: 'Camera hanging Issue', issueDetails: '', status: 'Open', createdDate: '2024-10-18', vehicleNo: 'MH30QR1234', location: 'Mumbai' },
-                { id: 66, assignedTo: 'Brijesh', client: 'CF-Mumbai', subRequest: 'Camera hanging Issue', issueDetails: '', status: 'Open', createdDate: '2024-10-17', vehicleNo: 'MH31ST5678', location: 'Mumbai' },
-                { id: 67, assignedTo: 'Brijesh', client: 'Infants', subRequest: 'Camera hanging Issue', issueDetails: '', status: 'Open', createdDate: '2024-10-16', vehicleNo: 'DL17UV9012', location: 'Delhi' },
-                { id: 68, assignedTo: 'Brijesh', client: 'Vozi', subRequest: 'Device Movement Issue', issueDetails: 'Need to remove device from vehicle', status: 'Open', createdDate: '2024-10-15', vehicleNo: 'KA18WX3456', location: 'Bangalore' },
-                { id: 69, assignedTo: 'Brijesh', client: 'Shofr-Bangalore', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-10-14', vehicleNo: 'KA19YZ7890', location: 'Bangalore' },
-                { id: 70, assignedTo: 'Brijesh', client: 'OHM Mobility', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-10-13', vehicleNo: 'TN06AB1234', location: 'Chennai' },
-                { id: 71, assignedTo: 'Brijesh', client: 'Euro-Blr', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-10-12', vehicleNo: 'KA20CD5678', location: 'Bangalore' },
-                { id: 72, assignedTo: 'Brijesh', client: 'Zingbus', subRequest: 'Device Offline Issue', issueDetails: 'Vehicle is running but camera offline', status: 'Open', createdDate: '2024-10-11', vehicleNo: 'HR03EF9012', location: 'Gurgaon' },
-                { id: 73, assignedTo: 'Brijesh', client: '3EV / 3Eco', subRequest: 'Full Black/Grey/White Video Screen', issueDetails: '', status: 'Open', createdDate: '2024-10-10', vehicleNo: 'MH32GH3456', location: 'Mumbai' },
-                { id: 74, assignedTo: 'Brijesh', client: 'CF-Mumbai', subRequest: 'Full Black/Grey/White Video Screen', issueDetails: '', status: 'Open', createdDate: '2024-10-09', vehicleNo: 'MH33IJ7890', location: 'Mumbai' },
-                { id: 75, assignedTo: 'Brijesh', client: 'Infants', subRequest: 'Memory Card Failure', issueDetails: 'Memory Cell Fault', status: 'Open', createdDate: '2024-10-08', vehicleNo: 'DL18KL1234', location: 'Delhi' },
-
-                // Additional Client Issues for Client Summary (Based on second screenshot)
-                { id: 76, assignedTo: 'Vikas', client: '3EV / 3Eco', subRequest: 'Device Offline Issue', issueDetails: '', status: 'Open', createdDate: '2024-10-07', vehicleNo: 'MH34MN5678', location: 'Mumbai' },
-                { id: 77, assignedTo: 'Vikas', client: '3EV / 3Eco', subRequest: 'Device Offline Issue', issueDetails: '', status: 'Open', createdDate: '2024-10-06', vehicleNo: 'MH35OP9012', location: 'Mumbai' },
-                { id: 78, assignedTo: 'Balaram', client: '3EV / 3Eco', subRequest: 'Device Offline Issue', issueDetails: '', status: 'Open', createdDate: '2024-10-05', vehicleNo: 'MH36QR3456', location: 'Mumbai' },
-                // Multiple Device Offline Issues for 3EV to reach count of 20
-                ...Array.from({length: 17}, (_, i) => ({
-                    id: 79 + i,
-                    assignedTo: ['Vikas', 'Balaram', 'Brijesh'][i % 3],
-                    client: '3EV / 3Eco',
-                    subRequest: 'Device Offline Issue',
-                    issueDetails: '',
-                    status: 'Open',
-                    createdDate: `2024-10-${String(4 - i).padStart(2, '0')}`,
-                    vehicleNo: `MH${37 + i}ST${String(1234 + i).padStart(4, '0')}`,
-                    location: 'Mumbai'
-                })),
-
-                // More CF-Mumbai issues to reach count of 22
-                ...Array.from({length: 10}, (_, i) => ({
-                    id: 96 + i,
-                    assignedTo: ['Vikas', 'Balaram'][i % 2],
-                    client: 'CF-Mumbai',
-                    subRequest: ['Device Movement Issue', 'Device Offline Issue', 'Video Screen', 'Alert Data Issue'][i % 4],
-                    issueDetails: '',
-                    status: 'Open',
-                    createdDate: `2024-09-${String(30 - i).padStart(2, '0')}`,
-                    vehicleNo: `MH${40 + i}UV${String(5678 + i).padStart(4, '0')}`,
-                    location: 'Mumbai'
-                })),
-
-                // Some closed and on-hold issues
-                { id: 106, assignedTo: 'Vikas', client: 'CF-Mumbai', subRequest: 'Device Offline Issue', issueDetails: 'Fixed', status: 'Closed', createdDate: '2024-11-01', closedDate: '2024-11-05', vehicleNo: 'MH50WX9012', location: 'Mumbai' },
-                { id: 107, assignedTo: 'Balaram', client: 'Infants', subRequest: 'GPS Module Failure', issueDetails: 'Resolved', status: 'Closed', createdDate: '2024-07-01', closedDate: '2024-07-10', vehicleNo: 'DL19YZ3456', location: 'Delhi' },
-                { id: 108, assignedTo: 'Brijesh', client: 'Vozi', subRequest: 'Memory Card Failure', issueDetails: 'Replaced', status: 'Closed', createdDate: '2024-10-01', closedDate: '2024-10-07', vehicleNo: 'KA21AB7890', location: 'Bangalore' },
-                { id: 109, assignedTo: 'Vikas', client: 'Green Drive Mobility', subRequest: 'Historical Video Issue', issueDetails: 'Waiting for parts', status: 'On Hold', createdDate: '2024-11-25', vehicleNo: 'MH51CD1234', location: 'Mumbai' },
-                { id: 110, assignedTo: 'Balaram', client: 'Boom Cabs', subRequest: 'Device Offline Issue', issueDetails: 'Customer not available', status: 'On Hold', createdDate: '2024-08-25', vehicleNo: 'DL20EF5678', location: 'Delhi' },
-                { id: 111, assignedTo: 'Brijesh', client: 'Chahal Transport', subRequest: 'Camera hanging Issue', issueDetails: 'Pending approval', status: 'On Hold', createdDate: '2024-10-20', vehicleNo: 'PB05GH9012', location: 'Punjab' },
-                
-                // More issues for proper client distribution
-                { id: 112, assignedTo: 'Vikas', client: 'DPS-Dehradun', subRequest: 'Device Offline Issue', issueDetails: '', status: 'Open', createdDate: '2024-11-24', vehicleNo: 'UK01IJ3456', location: 'Dehradun' },
-                { id: 113, assignedTo: 'Balaram', client: 'DPS-Dehradun', subRequest: 'Device Offline Issue', issueDetails: '', status: 'Open', createdDate: '2024-11-23', vehicleNo: 'UK02KL7890', location: 'Dehradun' },
-            ]
-        };
-
-        const CautioIssueTracker = () => {
+        const CautioLiveTracker = () => {
+            const [issues, setIssues] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
             const [activeTab, setActiveTab] = useState('dashboard');
-            const [data] = useState(sampleData);
             const [searchTerm, setSearchTerm] = useState('');
             const [filterClient, setFilterClient] = useState('');
             const [filterAssignee, setFilterAssignee] = useState('');
             const [filterStatus, setFilterStatus] = useState('');
+            const [lastUpdated, setLastUpdated] = useState(null);
 
-            // Calculate metrics
-            const metrics = useMemo(() => {
-                const issues = data.issues;
-                return {
-                    total: issues.length,
-                    open: issues.filter(i => i.status === 'Open').length,
-                    closed: issues.filter(i => i.status === 'Closed').length,
-                    onHold: issues.filter(i => i.status === 'On Hold').length
-                };
-            }, [data]);
+            // Your Google Sheet ID
+            const SHEET_ID = '1DzW-6Q7hTNn2hSJbEHOkSrbalOmbDIftdjw4I_PhEdA';
+            const SHEET_NAME = 'Issues- Realtime';
+            
+            // Convert Google Sheets URL to CSV export URL
+            const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
-            // Calculate assignee summary (exactly as per screenshot)
-            const assigneeSummary = useMemo(() => {
-                const openIssues = data.issues.filter(i => i.status === 'Open');
-                const summary = {};
+            // Function to calculate age in days
+            const calculateAge = (raisedDate, resolvedDate) => {
+                const raised = new Date(raisedDate);
+                const resolved = resolvedDate && resolvedDate.trim() !== '' ? new Date(resolvedDate) : new Date();
+                const diffTime = Math.abs(resolved - raised);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays;
+            };
+
+            // Function to parse status
+            const parseStatus = (resolvedValue, followUpDate) => {
+                const resolved = (resolvedValue || '').toString().toLowerCase().trim();
                 
-                openIssues.forEach(issue => {
-                    if (!summary[issue.assignedTo]) {
-                        summary[issue.assignedTo] = {};
-                    }
-                    
-                    const key = `${issue.subRequest}|${issue.issueDetails || ''}`;
-                    if (!summary[issue.assignedTo][key]) {
-                        summary[issue.assignedTo][key] = {
-                            subRequest: issue.subRequest,
-                            issueDetails: issue.issueDetails || '',
-                            count: 0,
-                            dates: []
-                        };
-                    }
-                    summary[issue.assignedTo][key].count++;
-                    summary[issue.assignedTo][key].dates.push(new Date(issue.createdDate));
-                });
+                if (resolved === 'yes') {
+                    return 'Resolved';
+                }
+                
+                // If not resolved, check if on hold
+                if (followUpDate && followUpDate.trim() !== '') {
+                    return 'On Hold';
+                }
+                
+                return 'Open';
+            };
 
-                // Convert to array format matching screenshot exactly
-                const result = [];
-                Object.keys(summary).forEach(assignee => {
-                    let totalCount = 0;
-                    let oldestDate = new Date();
+            // Fetch data from Google Sheets
+            const fetchSheetData = async () => {
+                try {
+                    setLoading(true);
+                    setError(null);
+
+                    const response = await fetch(CSV_URL);
                     
-                    const issues = Object.values(summary[assignee]).map(item => {
-                        totalCount += item.count;
-                        const minDate = new Date(Math.min(...item.dates));
-                        if (minDate < oldestDate) oldestDate = minDate;
-                        
-                        return {
-                            subRequest: item.subRequest,
-                            issueDetails: item.issueDetails,
-                            count: item.count
-                        };
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch data from Google Sheets. Please ensure the sheet is publicly accessible.');
+                    }
+
+                    const csvText = await response.text();
+                    
+                    Papa.parse(csvText, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: (results) => {
+                            const processedIssues = results.data.map((row, index) => {
+                                const status = parseStatus(row['Resolved Y/N'], row['Next Follow Up Date']);
+                                const age = calculateAge(
+                                    row['Timestamp Issues raised'],
+                                    row['Timestamp Issues Resolved']
+                                );
+
+                                return {
+                                    id: index + 1,
+                                    issueId: row['Issue ID'] || '',
+                                    client: row['Clients'] || '',
+                                    timestampRaised: row['Timestamp Issues raised'] || '',
+                                    subRequest: row['Sub-request'] || '',
+                                    issueDetails: row['Issue Details'] || '',
+                                    jiraTicketId: row['JIRA ticket ID'] || '',
+                                    vehicleNumber: row['Vehicle Number'] || '',
+                                    raisedBy: row['Raised by'] || '',
+                                    raisedVia: row['Raised via [Forum]'] || '',
+                                    assignedTo: row['Assigned To'] || '',
+                                    resolvedYN: row['Resolved Y/N'] || '',
+                                    timestampResolved: row['Timestamp Issues Resolved'] || '',
+                                    dateCurrentStatus: row['Date - Current Status'] || '',
+                                    nextFollowUpDate: row['Next Follow Up Date'] || '',
+                                    howCorrected: row['How was it corrected?'] || '',
+                                    responsiblePerson: row['Responsible Person'] || '',
+                                    days: row['Days'] || '',
+                                    location: row['Location'] || '',
+                                    area: row['Area'] || '',
+                                    city: row['City'] || '',
+                                    status: status,
+                                    age: age
+                                };
+                            });
+
+                            setIssues(processedIssues);
+                            setLastUpdated(new Date());
+                            setLoading(false);
+                        },
+                        error: (error) => {
+                            throw new Error(`CSV parsing error: ${error.message}`);
+                        }
                     });
 
-                    const daysDiff = Math.floor((new Date() - oldestDate) / (1000 * 60 * 60 * 24));
-                    
-                    result.push({
-                        assignedTo: assignee,
-                        issues: issues,
-                        totalCount: totalCount,
-                        oldestIssueAge: daysDiff
-                    });
-                });
+                } catch (err) {
+                    setError(err.message);
+                    setLoading(false);
+                    console.error('Error fetching data:', err);
+                }
+            };
 
-                return result.sort((a, b) => a.assignedTo.localeCompare(b.assignedTo));
-            }, [data]);
-
-            // Calculate client wise summary (exactly as per second screenshot)
-            const clientSummary = useMemo(() => {
-                const openIssues = data.issues.filter(i => i.status === 'Open');
-                const summary = {};
+            // Fetch data on component mount and set up auto-refresh
+            useEffect(() => {
+                fetchSheetData();
                 
-                openIssues.forEach(issue => {
-                    if (!summary[issue.client]) {
-                        summary[issue.client] = {
-                            count: 0,
-                            issueTypes: {}
-                        };
-                    }
-                    
-                    summary[issue.client].count++;
-                    
-                    if (!summary[issue.client].issueTypes[issue.subRequest]) {
-                        summary[issue.client].issueTypes[issue.subRequest] = 0;
-                    }
-                    summary[issue.client].issueTypes[issue.subRequest]++;
-                });
+                // Auto-refresh every 5 minutes
+                const interval = setInterval(fetchSheetData, 5 * 60 * 1000);
+                
+                return () => clearInterval(interval);
+            }, []);
 
-                // Convert to array format matching screenshot exactly
-                const result = Object.keys(summary).map(client => {
-                    const issueTypesStr = Object.entries(summary[client].issueTypes)
-                        .map(([type, count]) => {
-                            // Simplify the issue type names as per screenshot
-                            let simplifiedType = type;
-                            if (type === 'Device Offline Issue') simplifiedType = 'Device Offline Issue';
-                            if (type === 'Full Black/Grey/White Video Screen') simplifiedType = 'Video Screen';
-                            if (type === 'Camera hanging Issue') simplifiedType = 'Camera hanging';
-                            if (type === 'Device Movement Issue') simplifiedType = 'Device Movement';
-                            if (type === 'Memory Card Failure') simplifiedType = 'Memory Card';
-                            if (type === 'GPS Module Failure') simplifiedType = 'GPS Module';
-                            if (type === 'Alert Data Issue') simplifiedType = 'Alert Data';
-                            if (type === 'Power Cables Issue') simplifiedType = 'Power Cables';
-                            if (type === 'Live Video Issue') simplifiedType = 'Live Video';
-                            if (type === 'Historical Video Issue') simplifiedType = 'Historical Video';
-                            if (type === 'GPS Tracking') simplifiedType = 'GPS Tracking';
-                            
-                            return `${simplifiedType} ${count}`;
-                        })
-                        .join(' | ');
-                    
-                    return {
-                        client: client,
-                        count: summary[client].count,
-                        issueTypes: issueTypesStr
-                    };
-                });
-
-                return result.sort((a, b) => b.count - a.count);
-            }, [data]);
-
-            // Get unique values for filters
-            const uniqueClients = [...new Set(data.issues.map(i => i.client))].sort();
-            const uniqueAssignees = [...new Set(data.issues.map(i => i.assignedTo))].sort();
-            const uniqueLocations = [...new Set(data.issues.map(i => i.location))].sort();
-
-            // Filter issues
+            // Filter and search logic
             const filteredIssues = useMemo(() => {
-                return data.issues.filter(issue => {
+                return issues.filter(issue => {
                     const matchesSearch = searchTerm === '' || 
                         Object.values(issue).some(val => 
-                            val?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+                            val.toString().toLowerCase().includes(searchTerm.toLowerCase())
                         );
+                    
                     const matchesClient = filterClient === '' || issue.client === filterClient;
                     const matchesAssignee = filterAssignee === '' || issue.assignedTo === filterAssignee;
                     const matchesStatus = filterStatus === '' || issue.status === filterStatus;
                     
                     return matchesSearch && matchesClient && matchesAssignee && matchesStatus;
                 });
-            }, [data.issues, searchTerm, filterClient, filterAssignee, filterStatus]);
+            }, [issues, searchTerm, filterClient, filterAssignee, filterStatus]);
 
-            // Calculate assignee performance
-            const assigneePerformance = useMemo(() => {
-                const performance = {};
-                const allAssignees = [...new Set(data.issues.map(i => i.assignedTo))];
-                
-                allAssignees.forEach(assignee => {
-                    const assigneeIssues = data.issues.filter(i => i.assignedTo === assignee);
-                    const openIssues = assigneeIssues.filter(i => i.status === 'Open');
-                    const closedIssues = assigneeIssues.filter(i => i.status === 'Closed');
-                    const onHoldIssues = assigneeIssues.filter(i => i.status === 'On Hold');
-                    
-                    let avgResolutionTime = 0;
-                    if (closedIssues.length > 0) {
-                        const totalDays = closedIssues.reduce((sum, issue) => {
-                            if (issue.closedDate) {
-                                const days = Math.floor((new Date(issue.closedDate) - new Date(issue.createdDate)) / (1000 * 60 * 60 * 24));
-                                return sum + days;
-                            }
-                            return sum;
-                        }, 0);
-                        avgResolutionTime = Math.floor(totalDays / closedIssues.length);
+            // Get unique values for filters
+            const uniqueClients = useMemo(() => [...new Set(issues.map(i => i.client).filter(Boolean))].sort(), [issues]);
+            const uniqueAssignees = useMemo(() => [...new Set(issues.map(i => i.assignedTo).filter(Boolean))].sort(), [issues]);
+
+            // Calculate statistics
+            const stats = useMemo(() => {
+                const total = filteredIssues.length;
+                const open = filteredIssues.filter(i => i.status === 'Open').length;
+                const resolved = filteredIssues.filter(i => i.status === 'Resolved').length;
+                const onHold = filteredIssues.filter(i => i.status === 'On Hold').length;
+                const avgAge = total > 0 ? Math.round(filteredIssues.reduce((sum, i) => sum + i.age, 0) / total) : 0;
+
+                return { total, open, resolved, onHold, avgAge };
+            }, [filteredIssues]);
+
+            // Group by assignee
+            const issuesByAssignee = useMemo(() => {
+                const grouped = {};
+                filteredIssues.forEach(issue => {
+                    const assignee = issue.assignedTo || 'Unassigned';
+                    if (!grouped[assignee]) {
+                        grouped[assignee] = { total: 0, open: 0, resolved: 0, onHold: 0, issues: [] };
                     }
-                    
-                    const totalIssues = assigneeIssues.length;
-                    const closeRate = totalIssues > 0 ? (closedIssues.length / totalIssues * 100).toFixed(1) : 0;
-                    
-                    let performanceLevel = 'average';
-                    if (closeRate >= 80) performanceLevel = 'excellent';
-                    else if (closeRate >= 60) performanceLevel = 'good';
-                    else if (closeRate < 30) performanceLevel = 'poor';
-                    
-                    performance[assignee] = {
-                        total: totalIssues,
-                        open: openIssues.length,
-                        closed: closedIssues.length,
-                        onHold: onHoldIssues.length,
-                        avgResolutionTime,
-                        closeRate,
-                        performanceLevel
-                    };
+                    grouped[assignee].total++;
+                    grouped[assignee].issues.push(issue);
+                    if (issue.status === 'Open') grouped[assignee].open++;
+                    if (issue.status === 'Resolved') grouped[assignee].resolved++;
+                    if (issue.status === 'On Hold') grouped[assignee].onHold++;
                 });
-                
-                return performance;
-            }, [data.issues]);
+                return grouped;
+            }, [filteredIssues]);
+
+            // Group by client
+            const issuesByClient = useMemo(() => {
+                const grouped = {};
+                filteredIssues.forEach(issue => {
+                    const client = issue.client || 'Unknown';
+                    if (!grouped[client]) {
+                        grouped[client] = { total: 0, open: 0, resolved: 0, onHold: 0, issues: [] };
+                    }
+                    grouped[client].total++;
+                    grouped[client].issues.push(issue);
+                    if (issue.status === 'Open') grouped[client].open++;
+                    if (issue.status === 'Resolved') grouped[client].resolved++;
+                    if (issue.status === 'On Hold') grouped[client].onHold++;
+                });
+                return grouped;
+            }, [filteredIssues]);
+
+            // Group by location
+            const issuesByLocation = useMemo(() => {
+                const grouped = {};
+                filteredIssues.forEach(issue => {
+                    const location = issue.location || 'Unknown';
+                    if (!grouped[location]) {
+                        grouped[location] = { total: 0, open: 0, resolved: 0, onHold: 0, issues: [] };
+                    }
+                    grouped[location].total++;
+                    grouped[location].issues.push(issue);
+                    if (issue.status === 'Open') grouped[location].open++;
+                    if (issue.status === 'Resolved') grouped[location].resolved++;
+                    if (issue.status === 'On Hold') grouped[location].onHold++;
+                });
+                return grouped;
+            }, [filteredIssues]);
 
             // Render Dashboard
             const renderDashboard = () => (
                 <div className="space-y-6 animate-slide-up">
-                    {/* Metrics Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                         <div className="gradient-card rounded-xl p-6 text-white hover-lift">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-white/80 text-sm font-medium uppercase tracking-wider">Total Issues</p>
-                                    <p className="text-5xl font-bold mt-2">{metrics.total}</p>
-                                </div>
-                                <div className="bg-white/20 p-3 rounded-lg">
-                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                </div>
-                            </div>
+                            <p className="text-sm font-medium opacity-90">Total Issues</p>
+                            <p className="text-4xl font-bold mt-2">{stats.total}</p>
                         </div>
-                        
                         <div className="gradient-card-2 rounded-xl p-6 text-white hover-lift">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-white/80 text-sm font-medium uppercase tracking-wider">Open Issues</p>
-                                    <p className="text-5xl font-bold mt-2">{metrics.open}</p>
-                                </div>
-                                <div className="bg-white/20 p-3 rounded-lg">
-                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                            </div>
+                            <p className="text-sm font-medium opacity-90">Open Issues</p>
+                            <p className="text-4xl font-bold mt-2">{stats.open}</p>
                         </div>
-                        
-                        <div className="gradient-card-3 rounded-xl p-6 text-white hover-lift">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-white/80 text-sm font-medium uppercase tracking-wider">Closed Issues</p>
-                                    <p className="text-5xl font-bold mt-2">{metrics.closed}</p>
-                                </div>
-                                <div className="bg-white/20 p-3 rounded-lg">
-                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <div className="gradient-card-4 rounded-xl p-6 text-white hover-lift">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-white/80 text-sm font-medium uppercase tracking-wider">On Hold</p>
-                                    <p className="text-5xl font-bold mt-2">{metrics.onHold}</p>
-                                </div>
-                                <div className="bg-white/20 p-3 rounded-lg">
-                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                            </div>
+                            <p className="text-sm font-medium opacity-90">Resolved</p>
+                            <p className="text-4xl font-bold mt-2">{stats.resolved}</p>
+                        </div>
+                        <div className="gradient-card-3 rounded-xl p-6 text-white hover-lift">
+                            <p className="text-sm font-medium opacity-90">On Hold</p>
+                            <p className="text-4xl font-bold mt-2">{stats.onHold}</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-orange-400 to-pink-500 rounded-xl p-6 text-white hover-lift">
+                            <p className="text-sm font-medium opacity-90">Avg Age (Days)</p>
+                            <p className="text-4xl font-bold mt-2">{stats.avgAge}</p>
                         </div>
                     </div>
 
-                    {/* Assignee Summary */}
+                    {/* Issues Table */}
                     <div className="glass-morphism rounded-xl p-6">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">Assignee Summary</h2>
+                        <h2 className="text-2xl font-bold mb-4 text-gray-800">All Issues</h2>
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b-2 border-indigo-200">
-                                        <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Assigned To</th>
-                                        <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Issue</th>
-                                        <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Description</th>
-                                        <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase tracking-wider">Count</th>
-                                        <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase tracking-wider">Total</th>
-                                        <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase tracking-wider">Oldest Issue</th>
+                                        <th className="text-left p-3 font-semibold text-gray-700">Issue ID</th>
+                                        <th className="text-left p-3 font-semibold text-gray-700">Client</th>
+                                        <th className="text-left p-3 font-semibold text-gray-700">Issue Type</th>
+                                        <th className="text-left p-3 font-semibold text-gray-700">Vehicle No</th>
+                                        <th className="text-left p-3 font-semibold text-gray-700">Assignee</th>
+                                        <th className="text-left p-3 font-semibold text-gray-700">Status</th>
+                                        <th className="text-left p-3 font-semibold text-gray-700">Age (Days)</th>
+                                        <th className="text-left p-3 font-semibold text-gray-700">Location</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {assigneeSummary.map((assignee, index) => (
-                                        <React.Fragment key={index}>
-                                            {assignee.issues.map((issue, issueIndex) => (
-                                                <tr key={`${index}-${issueIndex}`} className="border-b border-gray-200 table-row-hover">
-                                                    {issueIndex === 0 && (
-                                                        <td rowSpan={assignee.issues.length} className="px-6 py-4 font-bold text-indigo-600 bg-indigo-50/50 border-r-2 border-indigo-200">
-                                                            {assignee.assignedTo}
-                                                        </td>
-                                                    )}
-                                                    <td className="px-6 py-4 text-sm">{issue.subRequest}</td>
-                                                    <td className="px-6 py-4 text-sm text-gray-600">{issue.issueDetails || '-'}</td>
-                                                    <td className="px-6 py-4 text-center">
-                                                        <span className="inline-flex items-center justify-center w-10 h-10 bg-indigo-100 text-indigo-800 rounded-full font-bold">
-                                                            {issue.count}
-                                                        </span>
-                                                    </td>
-                                                    {issueIndex === 0 && (
-                                                        <>
-                                                            <td rowSpan={assignee.issues.length} className="px-6 py-4 text-center bg-purple-50/50 border-l-2 border-purple-200">
-                                                                <span className="inline-flex items-center justify-center w-14 h-14 gradient-card text-white rounded-full font-bold text-xl">
-                                                                    {assignee.totalCount}
-                                                                </span>
-                                                            </td>
-                                                            <td rowSpan={assignee.issues.length} className="px-6 py-4 text-center bg-orange-50/50 border-l-2 border-orange-200">
-                                                                <div className="flex flex-col items-center">
-                                                                    <span className="text-sm text-gray-500 uppercase">Age</span>
-                                                                    <span className="font-bold text-2xl text-orange-600">{assignee.oldestIssueAge}</span>
-                                                                    <span className="text-xs text-gray-500">days</span>
-                                                                </div>
-                                                            </td>
-                                                        </>
-                                                    )}
-                                                </tr>
-                                            ))}
-                                        </React.Fragment>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    {/* Client Wise Summary */}
-                    <div className="glass-morphism rounded-xl p-6">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">Client Wise Summary</h2>
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-                                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Clients</th>
-                                        <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider">Issue Count</th>
-                                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Issue Type</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {clientSummary.map((client, index) => (
-                                        <tr key={index} className={`border-b ${index % 2 === 0 ? 'bg-blue-50/30' : 'bg-white'} table-row-hover`}>
-                                            <td className="px-6 py-4 font-semibold text-blue-700">{client.client}</td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full font-bold text-lg">
-                                                    {client.count}
+                                    {filteredIssues.map(issue => (
+                                        <tr key={issue.id} className="border-b border-gray-200 table-row-hover">
+                                            <td className="p-3">{issue.issueId}</td>
+                                            <td className="p-3">{issue.client}</td>
+                                            <td className="p-3">{issue.subRequest}</td>
+                                            <td className="p-3 font-mono text-sm">{issue.vehicleNumber}</td>
+                                            <td className="p-3">{issue.assignedTo}</td>
+                                            <td className="p-3">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                    issue.status === 'Open' ? 'bg-red-100 text-red-700' :
+                                                    issue.status === 'Resolved' ? 'bg-green-100 text-green-700' :
+                                                    'bg-yellow-100 text-yellow-700'
+                                                }`}>
+                                                    {issue.status}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <div className="text-sm text-gray-700">
-                                                    {client.issueTypes}
-                                                </div>
-                                            </td>
+                                            <td className="p-3">{issue.age}</td>
+                                            <td className="p-3">{issue.location}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -562,312 +379,249 @@
             // Render Assignee Tab
             const renderAssigneeTab = () => (
                 <div className="space-y-6 animate-slide-up">
-                    <div className="glass-morphism rounded-xl p-6">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">Assignee Performance Dashboard</h2>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                            {Object.entries(assigneePerformance).map(([assignee, perf]) => (
-                                <div key={assignee} className="glass-morphism rounded-lg p-6 hover-lift">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <h3 className="text-xl font-bold text-gray-800">{assignee}</h3>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold text-white performance-${perf.performanceLevel}`}>
-                                            {perf.performanceLevel.toUpperCase()}
-                                        </span>
-                                    </div>
-                                    
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Total Issues:</span>
-                                            <span className="font-bold text-lg">{perf.total}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Open:</span>
-                                            <span className="font-bold text-red-600">{perf.open}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Closed:</span>
-                                            <span className="font-bold text-green-600">{perf.closed}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">On Hold:</span>
-                                            <span className="font-bold text-yellow-600">{perf.onHold}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Close Rate:</span>
-                                            <span className="font-bold">{perf.closeRate}%</span>
-                                        </div>
-                                        {perf.avgResolutionTime > 0 && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-600">Avg Resolution:</span>
-                                                <span className="font-bold">{perf.avgResolutionTime} days</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    
-                                    <div className="mt-4">
-                                        <div className="w-full bg-gray-200 rounded-full h-3">
-                                            <div 
-                                                className={`h-3 rounded-full performance-${perf.performanceLevel}`}
-                                                style={{width: `${perf.closeRate}%`}}
-                                            ></div>
-                                        </div>
-                                    </div>
+                    {Object.entries(issuesByAssignee).map(([assignee, data]) => (
+                        <div key={assignee} className="glass-morphism rounded-xl p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-2xl font-bold text-gray-800">👤 {assignee}</h2>
+                                <div className="flex gap-4">
+                                    <span className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg font-semibold">
+                                        Total: {data.total}
+                                    </span>
+                                    <span className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold">
+                                        Open: {data.open}
+                                    </span>
+                                    <span className="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-semibold">
+                                        Resolved: {data.resolved}
+                                    </span>
+                                    <span className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg font-semibold">
+                                        Hold: {data.onHold}
+                                    </span>
                                 </div>
-                            ))}
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b-2 border-indigo-200">
+                                            <th className="text-left p-3 font-semibold text-gray-700">Issue ID</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Client</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Issue Type</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Vehicle No</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Status</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Age</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.issues.map(issue => (
+                                            <tr key={issue.id} className="border-b border-gray-200 table-row-hover">
+                                                <td className="p-3">{issue.issueId}</td>
+                                                <td className="p-3">{issue.client}</td>
+                                                <td className="p-3">{issue.subRequest}</td>
+                                                <td className="p-3 font-mono text-sm">{issue.vehicleNumber}</td>
+                                                <td className="p-3">
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                        issue.status === 'Open' ? 'bg-red-100 text-red-700' :
+                                                        issue.status === 'Resolved' ? 'bg-green-100 text-green-700' :
+                                                        'bg-yellow-100 text-yellow-700'
+                                                    }`}>
+                                                        {issue.status}
+                                                    </span>
+                                                </td>
+                                                <td className="p-3">{issue.age} days</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-
-                        <div className="space-y-4">
-                            <h3 className="text-xl font-bold text-gray-800">Detailed Issue List by Assignee</h3>
-                            {uniqueAssignees.map(assignee => {
-                                const assigneeIssues = filteredIssues.filter(i => i.assignedTo === assignee);
-                                return (
-                                    <div key={assignee} className="border rounded-lg overflow-hidden">
-                                        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4">
-                                            <h4 className="font-bold text-lg">{assignee} - {assigneeIssues.length} Issues</h4>
-                                        </div>
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full">
-                                                <thead className="bg-gray-50">
-                                                    <tr>
-                                                        <th className="px-4 py-2 text-left text-xs">ID</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Client</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Sub-Request</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Details</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Vehicle</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Location</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Status</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Created</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {assigneeIssues.map(issue => (
-                                                        <tr key={issue.id} className="border-b hover:bg-gray-50">
-                                                            <td className="px-4 py-2 text-sm">#{issue.id}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.client}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.subRequest}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.issueDetails || '-'}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.vehicleNo}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.location}</td>
-                                                            <td className="px-4 py-2">
-                                                                <span className={`px-2 py-1 rounded-full text-xs font-bold text-white ${
-                                                                    issue.status === 'Open' ? 'bg-red-500' :
-                                                                    issue.status === 'Closed' ? 'bg-green-500' :
-                                                                    'bg-yellow-500'
-                                                                }`}>
-                                                                    {issue.status}
-                                                                </span>
-                                                            </td>
-                                                            <td className="px-4 py-2 text-sm">{issue.createdDate}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
+                    ))}
                 </div>
             );
 
             // Render Client Tab
             const renderClientTab = () => (
                 <div className="space-y-6 animate-slide-up">
-                    <div className="glass-morphism rounded-xl p-6">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">Client Wise Detailed View</h2>
-                        
-                        <div className="space-y-4">
-                            {uniqueClients.map(client => {
-                                const clientIssues = filteredIssues.filter(i => i.client === client);
-                                const openCount = clientIssues.filter(i => i.status === 'Open').length;
-                                const closedCount = clientIssues.filter(i => i.status === 'Closed').length;
-                                const onHoldCount = clientIssues.filter(i => i.status === 'On Hold').length;
-                                
-                                return (
-                                    <div key={client} className="border rounded-lg overflow-hidden">
-                                        <div className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-4">
-                                            <div className="flex justify-between items-center">
-                                                <h4 className="font-bold text-lg">{client}</h4>
-                                                <div className="flex gap-4 text-sm">
-                                                    <span className="bg-white/20 px-3 py-1 rounded-full">Total: {clientIssues.length}</span>
-                                                    <span className="bg-red-500/50 px-3 py-1 rounded-full">Open: {openCount}</span>
-                                                    <span className="bg-green-500/50 px-3 py-1 rounded-full">Closed: {closedCount}</span>
-                                                    <span className="bg-yellow-500/50 px-3 py-1 rounded-full">On Hold: {onHoldCount}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full">
-                                                <thead className="bg-gray-50">
-                                                    <tr>
-                                                        <th className="px-4 py-2 text-left text-xs">ID</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Assigned To</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Sub-Request</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Details</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Vehicle</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Location</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Status</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Created</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {clientIssues.map(issue => (
-                                                        <tr key={issue.id} className="border-b hover:bg-gray-50">
-                                                            <td className="px-4 py-2 text-sm">#{issue.id}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.assignedTo}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.subRequest}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.issueDetails || '-'}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.vehicleNo}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.location}</td>
-                                                            <td className="px-4 py-2">
-                                                                <span className={`px-2 py-1 rounded-full text-xs font-bold text-white ${
-                                                                    issue.status === 'Open' ? 'bg-red-500' :
-                                                                    issue.status === 'Closed' ? 'bg-green-500' :
-                                                                    'bg-yellow-500'
-                                                                }`}>
-                                                                    {issue.status}
-                                                                </span>
-                                                            </td>
-                                                            <td className="px-4 py-2 text-sm">{issue.createdDate}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                    {Object.entries(issuesByClient).map(([client, data]) => (
+                        <div key={client} className="glass-morphism rounded-xl p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-2xl font-bold text-gray-800">🏢 {client}</h2>
+                                <div className="flex gap-4">
+                                    <span className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg font-semibold">
+                                        Total: {data.total}
+                                    </span>
+                                    <span className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold">
+                                        Open: {data.open}
+                                    </span>
+                                    <span className="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-semibold">
+                                        Resolved: {data.resolved}
+                                    </span>
+                                    <span className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg font-semibold">
+                                        Hold: {data.onHold}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b-2 border-indigo-200">
+                                            <th className="text-left p-3 font-semibold text-gray-700">Issue ID</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Issue Type</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Vehicle No</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Assignee</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Status</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Age</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.issues.map(issue => (
+                                            <tr key={issue.id} className="border-b border-gray-200 table-row-hover">
+                                                <td className="p-3">{issue.issueId}</td>
+                                                <td className="p-3">{issue.subRequest}</td>
+                                                <td className="p-3 font-mono text-sm">{issue.vehicleNumber}</td>
+                                                <td className="p-3">{issue.assignedTo}</td>
+                                                <td className="p-3">
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                        issue.status === 'Open' ? 'bg-red-100 text-red-700' :
+                                                        issue.status === 'Resolved' ? 'bg-green-100 text-green-700' :
+                                                        'bg-yellow-100 text-yellow-700'
+                                                    }`}>
+                                                        {issue.status}
+                                                    </span>
+                                                </td>
+                                                <td className="p-3">{issue.age} days</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
+                    ))}
                 </div>
             );
 
             // Render Location Tab
             const renderLocationTab = () => (
                 <div className="space-y-6 animate-slide-up">
-                    <div className="glass-morphism rounded-xl p-6">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">Location Wise Issue Distribution</h2>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                            {uniqueLocations.map(location => {
-                                const locationIssues = data.issues.filter(i => i.location === location);
-                                const openCount = locationIssues.filter(i => i.status === 'Open').length;
-                                const closedCount = locationIssues.filter(i => i.status === 'Closed').length;
-                                const onHoldCount = locationIssues.filter(i => i.status === 'On Hold').length;
-                                
-                                return (
-                                    <div key={location} className="glass-morphism rounded-lg p-6 hover-lift">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <h3 className="text-xl font-bold text-gray-800 flex items-center">
-                                                <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                </svg>
-                                                {location}
-                                            </h3>
-                                            <span className="text-3xl font-bold gradient-card text-transparent bg-clip-text">
-                                                {locationIssues.length}
-                                            </span>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-gray-600">Open:</span>
-                                                <span className="font-bold text-red-600">{openCount}</span>
-                                            </div>
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-gray-600">Closed:</span>
-                                                <span className="font-bold text-green-600">{closedCount}</span>
-                                            </div>
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-gray-600">On Hold:</span>
-                                                <span className="font-bold text-yellow-600">{onHoldCount}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                    {Object.entries(issuesByLocation).map(([location, data]) => (
+                        <div key={location} className="glass-morphism rounded-xl p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-2xl font-bold text-gray-800">📍 {location}</h2>
+                                <div className="flex gap-4">
+                                    <span className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg font-semibold">
+                                        Total: {data.total}
+                                    </span>
+                                    <span className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold">
+                                        Open: {data.open}
+                                    </span>
+                                    <span className="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-semibold">
+                                        Resolved: {data.resolved}
+                                    </span>
+                                    <span className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg font-semibold">
+                                        Hold: {data.onHold}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b-2 border-indigo-200">
+                                            <th className="text-left p-3 font-semibold text-gray-700">Issue ID</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Client</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Issue Type</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Vehicle No</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Assignee</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Status</th>
+                                            <th className="text-left p-3 font-semibold text-gray-700">Age</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.issues.map(issue => (
+                                            <tr key={issue.id} className="border-b border-gray-200 table-row-hover">
+                                                <td className="p-3">{issue.issueId}</td>
+                                                <td className="p-3">{issue.client}</td>
+                                                <td className="p-3">{issue.subRequest}</td>
+                                                <td className="p-3 font-mono text-sm">{issue.vehicleNumber}</td>
+                                                <td className="p-3">{issue.assignedTo}</td>
+                                                <td className="p-3">
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                        issue.status === 'Open' ? 'bg-red-100 text-red-700' :
+                                                        issue.status === 'Resolved' ? 'bg-green-100 text-green-700' :
+                                                        'bg-yellow-100 text-yellow-700'
+                                                    }`}>
+                                                        {issue.status}
+                                                    </span>
+                                                </td>
+                                                <td className="p-3">{issue.age} days</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        
-                        <div className="space-y-4">
-                            <h3 className="text-xl font-bold text-gray-800">Detailed Location Breakdown</h3>
-                            {uniqueLocations.map(location => {
-                                const locationIssues = filteredIssues.filter(i => i.location === location);
-                                
-                                return (
-                                    <div key={location} className="border rounded-lg overflow-hidden">
-                                        <div className="bg-gradient-to-r from-green-500 to-teal-600 text-white p-4">
-                                            <h4 className="font-bold text-lg">{location} - {locationIssues.length} Issues</h4>
-                                        </div>
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full">
-                                                <thead className="bg-gray-50">
-                                                    <tr>
-                                                        <th className="px-4 py-2 text-left text-xs">ID</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Client</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Assigned To</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Sub-Request</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Details</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Vehicle</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Status</th>
-                                                        <th className="px-4 py-2 text-left text-xs">Created</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {locationIssues.map(issue => (
-                                                        <tr key={issue.id} className="border-b hover:bg-gray-50">
-                                                            <td className="px-4 py-2 text-sm">#{issue.id}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.client}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.assignedTo}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.subRequest}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.issueDetails || '-'}</td>
-                                                            <td className="px-4 py-2 text-sm">{issue.vehicleNo}</td>
-                                                            <td className="px-4 py-2">
-                                                                <span className={`px-2 py-1 rounded-full text-xs font-bold text-white ${
-                                                                    issue.status === 'Open' ? 'bg-red-500' :
-                                                                    issue.status === 'Closed' ? 'bg-green-500' :
-                                                                    'bg-yellow-500'
-                                                                }`}>
-                                                                    {issue.status}
-                                                                </span>
-                                                            </td>
-                                                            <td className="px-4 py-2 text-sm">{issue.createdDate}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
+                    ))}
                 </div>
             );
 
+            if (loading) {
+                return (
+                    <div className="flex flex-col items-center justify-center min-h-screen">
+                        <div className="loading-spinner"></div>
+                        <p className="mt-4 text-xl font-semibold text-gray-700">Loading data from Google Sheets...</p>
+                    </div>
+                );
+            }
+
+            if (error) {
+                return (
+                    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+                        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg max-w-2xl">
+                            <h2 className="text-2xl font-bold mb-2">⚠️ Error Loading Data</h2>
+                            <p className="mb-4">{error}</p>
+                            <div className="bg-white p-4 rounded mt-4">
+                                <p className="font-semibold mb-2">Please ensure:</p>
+                                <ul className="list-disc list-inside space-y-1 text-sm">
+                                    <li>The Google Sheet is set to "Anyone with the link can view"</li>
+                                    <li>The sheet ID is correct: 1DzW-6Q7hTNn2hSJbEHOkSrbalOmbDIftdjw4I_PhEdA</li>
+                                    <li>The tab name is exactly: "Issues- Realtime"</li>
+                                </ul>
+                            </div>
+                            <button 
+                                onClick={fetchSheetData}
+                                className="mt-4 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                            >
+                                Retry
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
             return (
-                <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+                <div className="min-h-screen">
                     {/* Header */}
-                    <header className="bg-white shadow-lg border-b border-indigo-100">
-                        <div className="container mx-auto px-6 py-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-3 rounded-xl mr-4">
-                                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                        </svg>
-                                    </div>
+                    <header className="bg-white shadow-lg border-b-4 border-indigo-500">
+                        <div className="container mx-auto px-6 py-6">
+                            <div className="glass-morphism rounded-2xl p-6">
+                                <div className="flex justify-between items-center">
                                     <div>
-                                        <h1 className="text-3xl font-black text-gray-800">CAUTIO</h1>
-                                        <p className="text-sm text-gray-500">Professional Issue Tracking System</p>
+                                        <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                                            CAUTIO
+                                        </h1>
+                                        <p className="text-sm text-gray-600 mt-1">Live Issue Tracking System</p>
+                                        {lastUpdated && (
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Last updated: {lastUpdated.toLocaleString()}
+                                            </p>
+                                        )}
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-4">
                                     <div className="text-right">
-                                        <p className="text-xs text-gray-500 uppercase tracking-wider">System Status</p>
-                                        <p className="font-bold text-green-600 flex items-center">
-                                            <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                                            Operational
+                                        <button
+                                            onClick={fetchSheetData}
+                                            className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition mb-2"
+                                        >
+                                            🔄 Refresh Data
+                                        </button>
+                                        <p className="text-xs text-gray-500">
+                                            Auto-refresh: Every 5 minutes
                                         </p>
                                     </div>
                                 </div>
@@ -949,7 +703,7 @@
                                     >
                                         <option value="">All Status</option>
                                         <option value="Open">Open</option>
-                                        <option value="Closed">Closed</option>
+                                        <option value="Resolved">Resolved</option>
                                         <option value="On Hold">On Hold</option>
                                     </select>
                                 </div>
@@ -968,7 +722,7 @@
                     {/* Footer */}
                     <footer className="bg-gray-900 text-white py-6 mt-12">
                         <div className="container mx-auto px-6 text-center">
-                            <p className="text-sm">© 2024 Cautio. Professional Issue Tracking System | Version 2.0</p>
+                            <p className="text-sm">© 2024 Cautio Live Issue Tracking System | Connected to Google Sheets</p>
                         </div>
                     </footer>
                 </div>
@@ -976,7 +730,7 @@
         };
 
         // Render the app
-        ReactDOM.render(<CautioIssueTracker />, document.getElementById('root'));
+        ReactDOM.render(<CautioLiveTracker />, document.getElementById('root'));
     </script>
 </body>
 </html>
